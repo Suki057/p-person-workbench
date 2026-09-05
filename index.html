@@ -107,21 +107,41 @@
   .task-del{border:none;background:transparent;color:#c9bdbd;font-size:16px;cursor:pointer;padding:2px 6px;}
   .task-del:active{color:#e08a8a;}
 
-  /* 日记 */
-  .diary-stage{position:relative;overflow:hidden;border-radius:var(--radius);}
-  .diary-track{display:flex;transition:transform .35s ease;}
-  .diary-card{
-    flex:0 0 100%;padding:14px;background:var(--yellow);border-radius:var(--radius);min-height:230px;
-    display:flex;flex-direction:column;
+  /* 日记 · 翻页笔记本 */
+  .book{
+    position:relative;height:300px;perspective:1500px;
+    background:linear-gradient(135deg,#F3E9DC,#EDE1CF);
+    border-radius:var(--radius);margin-bottom:4px;
+    box-shadow:inset 0 0 0 1px #e7dccb;
   }
-  .diary-card .d-date{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:8px;}
-  .diary-card .d-img{width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:#fff;}
-  .diary-card .d-img-ph{width:100%;height:120px;border-radius:6px;margin-bottom:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#c9bdbd;font-size:12px;}
-  .diary-card .d-text{flex:1;font-size:14px;white-space:pre-wrap;word-break:break-word;}
-  .diary-empty{color:var(--done);font-size:13px;text-align:center;padding:40px 0;}
+  .book-spine{
+    position:absolute;left:0;top:0;bottom:0;width:16px;z-index:3;
+    background:linear-gradient(90deg,#d9c7b0,#efe3d2);
+    border-radius:var(--radius) 0 0 var(--radius);
+    box-shadow:2px 0 6px rgba(0,0,0,0.08);
+  }
+  .book-spine::before{
+    content:"";position:absolute;left:5px;top:14px;bottom:14px;width:2px;
+    background:repeating-linear-gradient(#c9b69c 0 6px,transparent 6px 14px);
+  }
+  .page{
+    position:absolute;left:16px;right:4px;top:6px;bottom:6px;
+    background:#FFFDF7;border-radius:0 8px 8px 0;
+    box-shadow:inset -10px 0 18px rgba(0,0,0,0.05), 3px 4px 10px rgba(0,0,0,0.07);
+    transform-origin:left center;backface-visibility:hidden;
+    padding:16px;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .page .d-date{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .page .d-date .tag{font-size:11px;background:var(--pink);color:#7a5a63;padding:1px 7px;border-radius:8px;}
+  .page .d-img{width:100%;height:118px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:#fff;}
+  .page .d-img-ph{width:100%;height:118px;border-radius:6px;margin-bottom:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#c9bdbd;font-size:12px;}
+  .page .d-text{flex:1;font-size:14px;white-space:pre-wrap;word-break:break-word;color:#5a5347;}
+  .diary-empty{color:var(--done);font-size:13px;text-align:center;padding:60px 0;}
   .diary-nav{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
   .diary-nav .month{font-size:13px;color:var(--done);}
-  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;}
+  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;transition:opacity .2s;}
+  .diary-nav button:active{opacity:.6;}
+  .diary-nav button:disabled{opacity:.4;}
   .diary-nav button:disabled{opacity:.4;}
   .diary-add{margin-top:12px;}
   .diary-add textarea{
@@ -196,9 +216,10 @@
 
     <!-- 右：月度日记 -->
     <div class="col" data-page-node-id="Ix3g2HuQmOmBlgWtPXrQLL">
-      <h2 data-page-node-id="Wzvgdv2W8JYFC9cHAJA0Rs">月度日记 <span class="hint" data-page-node-id="DBOAslyoHxQcWedjFJKjpH">左右滑动翻页</span></h2>
-      <div class="diary-stage" data-page-node-id="VsC2PEx1RHjPpcfEa2cMtv">
-        <div class="diary-track" id="diaryTrack" data-page-node-id="fGLJtQo94tKRCwwSpCeSso"></div>
+      <h2 data-page-node-id="Wzvgdv2W8JYFC9cHAJA0Rs">月度日记 <span class="hint" data-page-node-id="DBOAslyoHxQcWedjFJKjpH">翻页浏览手帐</span></h2>
+      <div class="book" id="book">
+        <div class="book-spine"></div>
+        <div class="page" id="diaryPage"></div>
       </div>
       <div class="diary-nav" data-page-node-id="d9FAO6VrwlPDZhHJEdTXv7">
         <button id="diaryPrev" onclick="diaryPrev()" data-page-node-id="hChKvkDKUD4IAhKUSKdV8g">‹ 上一页</button>
@@ -315,72 +336,86 @@ function addTask(){
 }
 document.getElementById('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
 
-/* ---------- 月度日记 ---------- */
-function renderDiary(){
-  const track=document.getElementById('diaryTrack');track.innerHTML='';
-  const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
+/* ---------- 月度日记 · 翻页笔记本 ---------- */
+function diaryMonthList(){
+  const list=state.diaries.slice().sort((a,b)=>a.date.localeCompare(b.date)); // 升序：翻页从早到晚
+  const ml=list.filter(d=>monthStr(d.date)===thisMonth());
+  return ml.length?ml:list;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function buildDiaryHTML(d){
+  const img=d.image?`<img class="d-img" src="${d.image}">`:`<div class="d-img-ph">无图片</div>`;
+  return `<div class="d-date">${d.date}<span class="tag">手帐</span></div>${img}<div class="d-text">${escapeHtml(d.text||'（无文字）')}</div>`;
+}
+function renderDiaryPage(){
+  const list=diaryMonthList();
+  const page=document.getElementById('diaryPage');
   const mon=document.getElementById('diaryMonth');
   if(list.length===0){
-    track.innerHTML='<div class="diary-card"><div class="diary-empty">本月还没有日记<br>在下方写下第一篇吧 🌿</div></div>';
-    mon.textContent=thisMonth();
-    diaryIndex=0;updateDiaryNav();return;
+    page.innerHTML='<div class="diary-empty">本月还没有日记<br>在下方写下第一篇吧 🌿</div>';
+    mon.textContent=thisMonth();diaryIndex=0;updateDiaryNav();return;
   }
-  // 仅展示本月的日记，其余月份提示（按月份归档）
-  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());
-  const showList=monthList.length?monthList:list;
-  showList.forEach(d=>{
-    const card=document.createElement('div');card.className='diary-card';
-    const dt=document.createElement('div');dt.className='d-date';dt.textContent=d.date;
-    card.appendChild(dt);
-    if(d.image){
-      const img=document.createElement('img');img.className='d-img';img.src=d.image;card.appendChild(img);
-    }else{
-      const ph=document.createElement('div');ph.className='d-img-ph';ph.textContent='无图片';card.appendChild(ph);
-    }
-    const tx=document.createElement('div');tx.className='d-text';tx.textContent=d.text||'（无文字）';
-    card.appendChild(tx);
-    track.appendChild(card);
-  });
-  if(diaryIndex>=showList.length)diaryIndex=showList.length-1;
   if(diaryIndex<0)diaryIndex=0;
-  mon.textContent=monthStr(showList[diaryIndex].date);
-  track.style.transform=`translateX(-${diaryIndex*100}%)`;
+  if(diaryIndex>=list.length)diaryIndex=list.length-1;
+  const d=list[diaryIndex];
+  page.innerHTML=buildDiaryHTML(d);
+  mon.textContent=monthStr(d.date)+' · '+(diaryIndex+1)+'/'+list.length;
   updateDiaryNav();
 }
+let flipLock=false;
+function flip(dir){ // dir: +1 下一页, -1 上一页
+  if(flipLock)return;
+  const list=diaryMonthList();
+  if(list.length===0)return;
+  const target=diaryIndex+dir;
+  if(target<0||target>=list.length)return;
+  flipLock=true;
+  const page=document.getElementById('diaryPage');
+  page.style.transition='transform .3s ease-in';
+  page.style.transform='rotateY('+(dir>0?-92:92)+'deg)'; // 当前页转向书脊
+  setTimeout(()=>{
+    diaryIndex=target;renderDiaryPage(); // 换内容
+    page.style.transition='none';
+    page.style.transform='rotateY('+(dir>0?92:-92)+'deg)'; // 从另一侧进入
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+      page.style.transition='transform .3s ease-out';
+      page.style.transform='rotateY(0deg)';
+    });});
+    setTimeout(()=>{flipLock=false;},320);
+  },300);
+}
+function diaryPrev(){flip(-1);}
+function diaryNext(){flip(1);}
 function updateDiaryNav(){
-  const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());
-  const n=monthList.length?monthList.length:list.length;
+  const n=diaryMonthList().length;
   document.getElementById('diaryPrev').disabled=diaryIndex<=0;
   document.getElementById('diaryNext').disabled=diaryIndex>=n-1;
 }
-function diaryPrev(){if(diaryIndex>0){diaryIndex--;renderDiary();}}
-function diaryNext(){const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());const n=monthList.length?monthList.length:list.length;
-  if(diaryIndex<n-1){diaryIndex++;renderDiary();}}
 function addDiary(){
   const tx=document.getElementById('diaryText');
   const file=document.getElementById('diaryImg');
   const text=tx.value.trim();
   if(!text&&!file.files.length){return;}
   const entry={id:Date.now(),date:todayStr(),text};
+  const done=()=>{
+    state.diaries.push(entry);save();tx.value='';file.value='';
+    const list=diaryMonthList();diaryIndex=Math.max(0,list.length-1); // 跳到最新一页
+    renderDiaryPage();
+  };
   if(file.files.length){
     const reader=new FileReader();
-    reader.onload=()=>{entry.image=reader.result;state.diaries.push(entry);save();tx.value='';file.value='';diaryIndex=0;renderDiary();};
+    reader.onload=()=>{entry.image=reader.result;done();};
     reader.readAsDataURL(file.files[0]);
-  }else{
-    state.diaries.push(entry);save();tx.value='';file.value='';diaryIndex=0;renderDiary();
-  }
+  }else done();
 }
 // 触摸滑动翻页
 (function(){
-  const stage=document.querySelector('.diary-stage');
-  let sx=0,sy=0,moved=false;
-  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
-  stage.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-sx)>10)moved=true;},{passive:true});
+  const stage=document.getElementById('book');
+  let sx=0,sy=0;
+  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
   stage.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-sx;
-    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(e.changedTouches[0].clientY-sy)){
+    const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){
       if(dx<0)diaryNext();else diaryPrev();
     }
   },{passive:true});
@@ -410,7 +445,7 @@ function updateStats(){
 /* 初始化 */
 renderHabits();
 renderTasks();
-renderDiary();
+renderDiaryPage();
 updateStats();
 
 /* 注册 Service Worker（支持离线 / 添加到手机屏幕） */
