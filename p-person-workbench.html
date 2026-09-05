@@ -100,21 +100,101 @@
   .task-del{border:none;background:transparent;color:#c9bdbd;font-size:16px;cursor:pointer;padding:2px 6px;}
   .task-del:active{color:#e08a8a;}
 
-  /* 日记 */
-  .diary-stage{position:relative;overflow:hidden;border-radius:var(--radius);}
-  .diary-track{display:flex;transition:transform .35s ease;}
-  .diary-card{
-    flex:0 0 100%;padding:14px;background:var(--yellow);border-radius:var(--radius);min-height:230px;
-    display:flex;flex-direction:column;
+  /* 周计划手帐 */
+  .planner{
+    position:relative;height:360px;perspective:1500px;
+    background:linear-gradient(135deg,#F3E9DC,#EDE1CF);
+    border-radius:var(--radius);margin-bottom:4px;
+    box-shadow:inset 0 0 0 1px #e7dccb, var(--shadow);
+    display:flex;padding:8px 0;gap:0;
   }
-  .diary-card .d-date{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:8px;}
-  .diary-card .d-img{width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:#fff;}
-  .diary-card .d-img-ph{width:100%;height:120px;border-radius:6px;margin-bottom:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#c9bdbd;font-size:12px;}
-  .diary-card .d-text{flex:1;font-size:14px;white-space:pre-wrap;word-break:break-word;}
-  .diary-empty{color:var(--done);font-size:13px;text-align:center;padding:40px 0;}
+  .planner-spine{
+    position:absolute;left:50%;top:8px;bottom:8px;width:18px;
+    transform:translateX(-50%);z-index:3;
+    background:linear-gradient(90deg,#d9c7b0,#efe3d2,#d9c7b0);
+    border-radius:3px;
+    box-shadow:0 0 8px rgba(0,0,0,0.1), inset 0 0 3px rgba(0,0,0,0.05);
+  }
+  .planner-spine::before{
+    content:"";position:absolute;left:50%;top:14px;bottom:14px;width:2px;
+    transform:translateX(-50%);
+    background:repeating-linear-gradient(#c9b69c 0 5px,transparent 5px 12px);
+  }
+  .planner-left,.planner-right{
+    flex:1;background:#FFFDF7;padding:14px 12px;
+    position:relative;overflow:hidden;
+  }
+  .planner-left{
+    border-radius:8px 0 0 8px;margin-left:8px;
+    transform:rotateY(2deg);transform-origin:right center;
+    box-shadow:inset -8px 0 18px rgba(0,0,0,0.04), 2px 0 6px rgba(0,0,0,0.04);
+  }
+  .planner-right{
+    border-radius:0 8px 8px 0;margin-right:8px;
+    transform:rotateY(-2deg);transform-origin:left center;
+    box-shadow:inset 8px 0 18px rgba(0,0,0,0.04), -2px 0 6px rgba(0,0,0,0.04);
+  }
+
+  /* 左页：周概览 */
+  .pw-header{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .pw-header .week-no{font-size:11px;background:var(--pink);color:#7a5a63;padding:1px 7px;border-radius:8px;}
+  .pw-list{max-height:290px;overflow-y:auto;}
+  .pw-day{
+    display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;
+    padding:5px 4px;border-radius:6px;cursor:pointer;transition:background .2s;
+  }
+  .pw-day:hover{background:rgba(0,0,0,0.02);}
+  .pw-day.active{background:rgba(173,217,190,0.22);}
+  .pw-date{flex:0 0 42px;text-align:center;}
+  .pw-date .d-num{font-size:17px;font-weight:700;color:#5a5347;line-height:1;}
+  .pw-date .d-week{font-size:11px;color:var(--done);margin-top:2px;}
+  .pw-events{flex:1;min-width:0;}
+  .pw-event-mini{
+    font-size:11px;color:#4a4a4a;background:rgba(224,240,230,0.85);
+    padding:2px 8px;border-radius:6px;margin-bottom:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .pw-event-mini.done{text-decoration:line-through;color:var(--done);background:#f0f0f0;}
+  .pw-event-mini.diary{background:var(--pink);}
+  .pw-empty-mini{font-size:11px;color:#ddd;padding:2px 8px;}
+
+  /* 右页：日详情 */
+  .pr-header{
+    display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;
+  }
+  .pr-date{display:flex;align-items:baseline;gap:8px;}
+  .pr-date .d-num{font-size:28px;font-weight:700;color:#5a5347;line-height:1;}
+  .pr-date .d-week{font-size:13px;color:var(--done);}
+  .pr-avatar{
+    width:36px;height:36px;border-radius:50%;background:var(--yellow);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    box-shadow:var(--shadow);position:relative;cursor:pointer;
+  }
+  .pr-add{
+    position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;
+    background:#ff6b6b;color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:14px;line-height:1;box-shadow:0 2px 4px rgba(0,0,0,0.15);
+  }
+  .pr-events{max-height:250px;overflow-y:auto;}
+  .pr-event{
+    background:var(--green-mid);color:#fff;border-radius:10px;
+    padding:10px 12px;margin-bottom:8px;position:relative;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);cursor:pointer;
+    transition:opacity .2s,transform .15s;
+  }
+  .pr-event:active{transform:scale(.98);}
+  .pr-event.done{opacity:.55;background:#b8c9bf;}
+  .pr-event .ev-text{font-size:14px;font-weight:500;}
+  .pr-event .ev-text.done{text-decoration:line-through;}
+  .pr-event .ev-tag{font-size:10px;opacity:.92;margin-top:5px;}
+  .pr-event.diary{background:var(--pink-mid);}
+  .pr-diary-img{width:100%;height:86px;object-fit:cover;border-radius:8px;margin-bottom:8px;}
+  .pr-empty{color:var(--done);font-size:13px;text-align:center;padding:50px 0;}
+
   .diary-nav{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
   .diary-nav .month{font-size:13px;color:var(--done);}
-  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;}
+  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;transition:opacity .2s;}
+  .diary-nav button:active{opacity:.6;}
   .diary-nav button:disabled{opacity:.4;}
   .diary-add{margin-top:12px;}
   .diary-add textarea{
@@ -129,6 +209,12 @@
     .columns{flex-direction:column;}
     .col{width:100%;}
     body{padding:10px;}
+    .planner{height:380px;}
+    .planner-left{padding:12px 8px;}
+    .planner-right{padding:12px 8px;}
+    .pw-date{flex:0 0 38px;}
+    .pw-date .d-num{font-size:15px;}
+    .pr-date .d-num{font-size:22px;}
   }
 </style>
 </head>
@@ -187,22 +273,24 @@
       <div id="taskList" data-page-node-id="JEvu8T3o23AqtJrlBzhMdX"></div>
     </div>
 
-    <!-- 右：月度日记 -->
-    <div class="col" data-page-node-id="Ix3g2HuQmOmBlgWtPXrQLL">
-      <h2 data-page-node-id="Wzvgdv2W8JYFC9cHAJA0Rs">月度日记 <span class="hint" data-page-node-id="DBOAslyoHxQcWedjFJKjpH">左右滑动翻页</span></h2>
-      <div class="diary-stage" data-page-node-id="VsC2PEx1RHjPpcfEa2cMtv">
-        <div class="diary-track" id="diaryTrack" data-page-node-id="fGLJtQo94tKRCwwSpCeSso"></div>
+    <!-- 右：周计划手帐 -->
+    <div class="col col-diary">
+      <h2>周计划手帐 <span class="hint">左页选日期 · 右页看详情</span></h2>
+      <div class="planner" id="planner">
+        <div class="planner-spine"></div>
+        <div class="planner-left" id="plannerLeft"></div>
+        <div class="planner-right" id="plannerRight"></div>
       </div>
-      <div class="diary-nav" data-page-node-id="d9FAO6VrwlPDZhHJEdTXv7">
-        <button id="diaryPrev" onclick="diaryPrev()" data-page-node-id="hChKvkDKUD4IAhKUSKdV8g">‹ 上一页</button>
-        <span class="month" id="diaryMonth" data-page-node-id="iLH67X0KAQYqIaeMl2dEV6"></span>
-        <button id="diaryNext" onclick="diaryNext()" data-page-node-id="AbWNjwDU3VWTnKw2gAzFSc">下一页 ›</button>
+      <div class="diary-nav">
+        <button id="diaryPrev" onclick="diaryPrev()">‹ 上一天</button>
+        <span class="month" id="diaryMonth"></span>
+        <button id="diaryNext" onclick="diaryNext()">下一天 ›</button>
       </div>
-      <div class="diary-add" data-page-node-id="DdK1msqg3i7YKZygBNt0ch">
+      <div class="diary-add">
         <textarea id="diaryText" placeholder="记录今天的一点小事…"></textarea>
-        <div class="row" data-page-node-id="3lwsEdqTHfQGFHQNI6XAtt">
-          <input type="file" id="diaryImg" accept="image/*" data-page-node-id="HjbA4dnZGUFT7qHuJpea7s">
-          <button class="btn" onclick="addDiary()" data-page-node-id="qEhXsq9nq5F2swxgIncXpR">保存日记</button>
+        <div class="row">
+          <input type="file" id="diaryImg" accept="image/*">
+          <button class="btn" onclick="addDiary()">保存日记</button>
         </div>
       </div>
     </div>
@@ -219,7 +307,6 @@ const DAYS=7;
 const STORE_KEY='pperson_workbench_v1';
 
 let state=loadState();
-let diaryIndex=0;
 
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function monthStr(s){return s.slice(0,7);}
@@ -308,72 +395,131 @@ function addTask(){
 }
 document.getElementById('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
 
-/* ---------- 月度日记 ---------- */
-function renderDiary(){
-  const track=document.getElementById('diaryTrack');track.innerHTML='';
-  const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  const mon=document.getElementById('diaryMonth');
-  if(list.length===0){
-    track.innerHTML='<div class="diary-card"><div class="diary-empty">本月还没有日记<br>在下方写下第一篇吧 🌿</div></div>';
-    mon.textContent=thisMonth();
-    diaryIndex=0;updateDiaryNav();return;
-  }
-  // 仅展示本月的日记，其余月份提示（按月份归档）
-  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());
-  const showList=monthList.length?monthList:list;
-  showList.forEach(d=>{
-    const card=document.createElement('div');card.className='diary-card';
-    const dt=document.createElement('div');dt.className='d-date';dt.textContent=d.date;
-    card.appendChild(dt);
-    if(d.image){
-      const img=document.createElement('img');img.className='d-img';img.src=d.image;card.appendChild(img);
-    }else{
-      const ph=document.createElement('div');ph.className='d-img-ph';ph.textContent='无图片';card.appendChild(ph);
-    }
-    const tx=document.createElement('div');tx.className='d-text';tx.textContent=d.text||'（无文字）';
-    card.appendChild(tx);
-    track.appendChild(card);
+/* ---------- 周计划手帐 ---------- */
+let selectedDate=todayStr();
+const DAY_NAMES=['周日','周一','周二','周三','周四','周五','周六'];
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function formatDateObj(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getWeekDates(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  const day=d.getDay();const offset=day===0?-6:1-day;
+  const mon=new Date(d);mon.setDate(d.getDate()+offset);
+  const dates=[];for(let i=0;i<7;i++){const dd=new Date(mon);dd.setDate(mon.getDate()+i);dates.push(formatDateObj(dd));}
+  return dates;
+}
+function dayName(dateStr){return DAY_NAMES[new Date(dateStr+'T00:00:00').getDay()];}
+function weekNumber(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  const start=new Date(d.getFullYear(),0,1);
+  const diff=d-start+((start.getDay()+6)%7)*86400000;
+  return Math.floor(diff/604800000)+1;
+}
+function getDayEvents(dateStr){
+  return{
+    tasks:state.tasks.filter(t=>t.date===dateStr).sort((a,b)=>b.id-a.id),
+    diaries:state.diaries.filter(d=>d.date===dateStr).sort((a,b)=>b.id-a.id)
+  };
+}
+function renderPlanner(){
+  const week=getWeekDates(selectedDate);
+  const left=document.getElementById('plannerLeft');
+  const right=document.getElementById('plannerRight');
+  const monthLabel=document.getElementById('diaryMonth');
+
+  // 左页：周概览
+  let leftHTML=`<div class="pw-header">${Number(selectedDate.slice(5,7))}月 <span class="week-no">第${weekNumber(week[0])}周</span></div><div class="pw-list">`;
+  week.forEach(date=>{
+    const {tasks,diaries}=getDayEvents(date);
+    const isActive=date===selectedDate;
+    const isToday=date===todayStr();
+    leftHTML+=`<div class="pw-day ${isActive?'active':''}" onclick="selectDate('${date}')">
+      <div class="pw-date">
+        <div class="d-num">${Number(date.slice(8))}</div>
+        <div class="d-week">${dayName(date)}${isToday?' · 今':''}</div>
+      </div>
+      <div class="pw-events">
+        ${tasks.map(t=>`<div class="pw-event-mini ${t.done?'done':''}">${escapeHtml(t.text)}</div>`).join('')}
+        ${diaries.map(d=>`<div class="pw-event-mini diary">📝 日记</div>`).join('')}
+        ${!tasks.length&&!diaries.length?'<div class="pw-empty-mini">—</div>':''}
+      </div>
+    </div>`;
   });
-  if(diaryIndex>=showList.length)diaryIndex=showList.length-1;
-  if(diaryIndex<0)diaryIndex=0;
-  mon.textContent=monthStr(showList[diaryIndex].date);
-  track.style.transform=`translateX(-${diaryIndex*100}%)`;
+  leftHTML+='</div>';
+  left.innerHTML=leftHTML;
+
+  // 右页：日详情
+  const {tasks,diaries}=getDayEvents(selectedDate);
+  let rightHTML=`<div class="pr-header">
+    <div class="pr-date"><div class="d-num">${Number(selectedDate.slice(8))}</div><div class="d-week">${dayName(selectedDate)}</div></div>
+    <div class="pr-avatar" onclick="focusDiary()">🌿<div class="pr-add">+</div></div>
+  </div><div class="pr-events">`;
+  if(!tasks.length&&!diaries.length){
+    rightHTML+=`<div class="pr-empty">这一天还没有记录<br>在下方写点什么吧 🌿</div>`;
+  }else{
+    tasks.forEach(t=>{
+      rightHTML+=`<div class="pr-event ${t.done?'done':''}" onclick="toggleTask(${t.id})">
+        <div class="ev-text ${t.done?'done':''}">${escapeHtml(t.text)}</div>
+        <div class="ev-tag">#${selectedDate.slice(0,7)} | 每天一件自律小事</div>
+      </div>`;
+    });
+    diaries.forEach(d=>{
+      rightHTML+=`<div class="pr-event diary">
+        ${d.image?`<img class="pr-diary-img" src="${d.image}">`:''}
+        <div class="ev-text">${escapeHtml(d.text||'')}</div>
+        <div class="ev-tag">#${selectedDate.slice(0,7)} | 手帐日记</div>
+      </div>`;
+    });
+  }
+  rightHTML+='</div>';
+  right.innerHTML=rightHTML;
+
+  monthLabel.textContent=selectedDate.slice(0,7)+' · '+dayName(selectedDate);
   updateDiaryNav();
 }
+function selectDate(date){selectedDate=date;renderPlanner();}
 function updateDiaryNav(){
-  const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());
-  const n=monthList.length?monthList.length:list.length;
-  document.getElementById('diaryPrev').disabled=diaryIndex<=0;
-  document.getElementById('diaryNext').disabled=diaryIndex>=n-1;
+  const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
+  document.getElementById('diaryPrev').disabled=idx<=0;
+  document.getElementById('diaryNext').disabled=idx>=week.length-1;
 }
-function diaryPrev(){if(diaryIndex>0){diaryIndex--;renderDiary();}}
-function diaryNext(){const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());const n=monthList.length?monthList.length:list.length;
-  if(diaryIndex<n-1){diaryIndex++;renderDiary();}}
+function diaryPrev(){
+  const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
+  if(idx>0){selectedDate=week[idx-1];renderPlanner();}
+}
+function diaryNext(){
+  const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
+  if(idx<week.length-1){selectedDate=week[idx+1];renderPlanner();}
+}
+function toggleTask(id){
+  const t=state.tasks.find(x=>x.id===id);
+  if(t){t.done=!t.done;save();renderTasks();renderPlanner();updateStats();}
+}
+function focusDiary(){document.getElementById('diaryText').focus();}
 function addDiary(){
   const tx=document.getElementById('diaryText');
   const file=document.getElementById('diaryImg');
   const text=tx.value.trim();
   if(!text&&!file.files.length){return;}
-  const entry={id:Date.now(),date:todayStr(),text};
+  const entry={id:Date.now(),date:selectedDate,text};
+  const done=()=>{
+    state.diaries.push(entry);save();tx.value='';file.value='';
+    renderPlanner();renderTasks();updateStats();
+  };
   if(file.files.length){
     const reader=new FileReader();
-    reader.onload=()=>{entry.image=reader.result;state.diaries.push(entry);save();tx.value='';file.value='';diaryIndex=0;renderDiary();};
+    reader.onload=()=>{entry.image=reader.result;done();};
     reader.readAsDataURL(file.files[0]);
-  }else{
-    state.diaries.push(entry);save();tx.value='';file.value='';diaryIndex=0;renderDiary();
-  }
+  }else done();
 }
-// 触摸滑动翻页
+// 触摸滑动切换日期
 (function(){
-  const stage=document.querySelector('.diary-stage');
-  let sx=0,sy=0,moved=false;
-  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
-  stage.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-sx)>10)moved=true;},{passive:true});
+  const stage=document.getElementById('planner');
+  if(!stage)return;
+  let sx=0,sy=0;
+  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
   stage.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-sx;
-    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(e.changedTouches[0].clientY-sy)){
+    const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){
       if(dx<0)diaryNext();else diaryPrev();
     }
   },{passive:true});
@@ -403,7 +549,7 @@ function updateStats(){
 /* 初始化 */
 renderHabits();
 renderTasks();
-renderDiary();
+renderPlanner();
 updateStats();
 </script>
 </body>
