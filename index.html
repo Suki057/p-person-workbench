@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="fNeVUZyg6L80A1Z8CHjLYX">
+<head data-page-node-id="ob70oRAXIowFvACqBwAupz">
+<meta charset="UTF-8" data-page-node-id="xUrc9vl924408JvlCjRIVH">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="YkVHUvhAO03RxGZ66WBECv">
+<title>P人爆改J人 · 自律打卡工作台</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="自律打卡">
+<meta name="theme-color" content="#E6B8C4">
+<style>
+  :root{
+    --bg:#FAF8F5;
+    --pink:#F8E0E6;
+    --green:#E0F0E6;
+    --yellow:#F8F0E0;
+    --pink-mid:#E6B8C4;
+    --green-mid:#ADD9BE;
+    --yellow-mid:#E6D2A6;
+    --text:#4a4a4a;
+    --done:#999999;
+    --shadow:rgba(0,0,0,0.05) 0px 2px 8px;
+    --radius:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Helvetica,"Microsoft YaHei",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.5;
+    padding:16px;
+    min-height:100vh;
+  }
+  .app{max-width:1280px;margin:0 auto;}
+  h1.title{font-size:16px;font-weight:600;margin-bottom:4px;}
+  .subtitle{font-size:13px;color:var(--done);margin-bottom:16px;}
+
+  /* 顶部统计 */
+  .stats{
+    display:flex;gap:16px;flex-wrap:wrap;align-items:center;
+    background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px 20px;margin-bottom:16px;
+  }
+  .ring-wrap{display:flex;align-items:center;gap:10px;}
+  .ring{position:relative;width:72px;height:72px;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring-bg{fill:none;stroke:#eee;stroke-width:7;}
+  .ring-fg{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
+  .ring-pct{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:600;
+  }
+  .ring-label{font-size:13px;}
+  .ring-label b{display:block;font-size:15px;margin-top:2px;}
+  .stats-divider{width:1px;height:48px;background:#eee;}
+
+  /* 三栏布局 */
+  .columns{display:flex;gap:16px;align-items:flex-start;}
+  .col{flex:1;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;}
+  .col h2{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+  .col h2 .hint{font-size:12px;color:var(--done);font-weight:400;}
+
+  /* 周打卡 */
+  .week-head{display:grid;grid-template-columns:80px repeat(7,1fr);gap:6px;margin-bottom:8px;}
+  .week-head div{text-align:center;font-size:12px;color:var(--done);}
+  .habit-row{display:grid;grid-template-columns:80px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:10px;}
+  .habit-name{font-size:14px;display:flex;align-items:center;gap:6px;}
+  .habit-name .streak{font-size:11px;color:var(--done);}
+  .dot{
+    width:30px;height:30px;border-radius:50%;margin:0 auto;cursor:pointer;
+    background:#fff;border:1.5px solid #e3e0dc;display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:#fff;transition:transform .15s, background .2s;
+    user-select:none;
+  }
+  .dot:active{transform:scale(.85);}
+  .dot.done{background:var(--c);border-color:var(--c);}
+  .dot.done::after{content:"✓";}
+  .add-habit{margin-top:8px;display:flex;gap:6px;}
+  .add-habit input{flex:1;border:1px solid #e3e0dc;border-radius:6px;padding:7px 9px;font-size:13px;background:var(--bg);}
+  .btn{
+    border:none;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;
+    background:var(--pink);color:#7a5a63;transition:opacity .2s;
+  }
+  .btn:active{opacity:.7;}
+  .btn.green{background:var(--green);color:#4f6f5a;}
+  .btn.ghost{background:transparent;color:var(--done);}
+
+  /* 任务清单 */
+  .task-add{display:flex;gap:6px;margin-bottom:14px;}
+  .task-add input{flex:1;border:1px solid #e3e0dc;border-radius:6px;padding:8px 10px;font-size:14px;background:var(--bg);}
+  .task-date-group{margin-bottom:14px;}
+  .task-date{font-size:12px;color:var(--done);margin:8px 0 6px;border-left:3px solid var(--green-mid);padding-left:8px;}
+  .task-item{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px dashed #f0ede9;}
+  .task-check{
+    width:22px;height:22px;border-radius:50%;border:1.5px solid #d8d4cf;flex:0 0 auto;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;background:#fff;transition:background .2s,transform .15s;
+  }
+  .task-check:active{transform:scale(.85);}
+  .task-check.done{background:var(--green-mid);border-color:var(--green-mid);}
+  .task-check.done::after{content:"✓";}
+  .task-text{flex:1;font-size:14px;transition:color .2s;}
+  .task-text.done{color:var(--done);text-decoration:line-through;}
+  .task-del{border:none;background:transparent;color:#c9bdbd;font-size:16px;cursor:pointer;padding:2px 6px;}
+  .task-del:active{color:#e08a8a;}
+
+  /* 日记 */
+  .diary-stage{position:relative;overflow:hidden;border-radius:var(--radius);}
+  .diary-track{display:flex;transition:transform .35s ease;}
+  .diary-card{
+    flex:0 0 100%;padding:14px;background:var(--yellow);border-radius:var(--radius);min-height:230px;
+    display:flex;flex-direction:column;
+  }
+  .diary-card .d-date{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:8px;}
+  .diary-card .d-img{width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:#fff;}
+  .diary-card .d-img-ph{width:100%;height:120px;border-radius:6px;margin-bottom:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#c9bdbd;font-size:12px;}
+  .diary-card .d-text{flex:1;font-size:14px;white-space:pre-wrap;word-break:break-word;}
+  .diary-empty{color:var(--done);font-size:13px;text-align:center;padding:40px 0;}
+  .diary-nav{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+  .diary-nav .month{font-size:13px;color:var(--done);}
+  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;}
+  .diary-nav button:disabled{opacity:.4;}
+  .diary-add{margin-top:12px;}
+  .diary-add textarea{
+    width:100%;border:1px solid #e3e0dc;border-radius:6px;padding:8px;font-size:13px;resize:vertical;
+    min-height:54px;background:var(--bg);font-family:inherit;margin-bottom:6px;
+  }
+  .diary-add .row{display:flex;gap:6px;align-items:center;}
+  .diary-add input[type=file]{font-size:12px;flex:1;}
+  .diary-add .btn{background:var(--green);color:#4f6f5a;}
+
+  @media (max-width:900px){
+    .columns{flex-direction:column;}
+    .col{width:100%;}
+    body{padding:10px;}
+  }
+</style>
+</head>
+<body data-page-node-id="rfz7qtJM0zmHaz3jVoKH7A">
+<div class="app" data-page-node-id="7jokPQICApHd2uJDB8vQnw">
+  <h1 class="title" data-page-node-id="aTM4DTpmgofSaSBmdsaNt2">P人爆改J人 · 自律打卡工作台</h1>
+  <div class="subtitle" data-page-node-id="CoUwIIYqQSTXXqrxj4CH1w">周打卡 · 任务清单 · 月度日记 · 一眼看清完成进度</div>
+
+  <!-- 顶部数据统计 -->
+  <div class="stats" data-page-node-id="h9LpFJoojvE3itLofs1Gxl">
+    <div class="ring-wrap" data-page-node-id="ClnJ4sV0zhHHDMrl06kSRX">
+      <div class="ring" data-page-node-id="8sBNN3KurCcuycDeCISgFS">
+        <svg width="72" height="72" data-page-node-id="cnBWhGDoG6HRCXyVOoy59U">
+          <circle class="ring-bg" cx="36" cy="36" r="30" data-page-node-id="EKADhcCUEM2aQViXZQ4qtJ"></circle>
+          <circle class="ring-fg" id="ringWeekFg" cx="36" cy="36" r="30" stroke="#E6B8C4" data-page-node-id="YwzObfOv4MJ3UV2t1JBcxf"></circle>
+        </svg>
+        <div class="ring-pct" id="ringWeekPct" data-page-node-id="2sdZ473LCSPhVSRht75doY">0%</div>
+      </div>
+      <div class="ring-label" data-page-node-id="32cj5c1hFZY6bTAK1dEVRG">本周打卡完成率<b id="ringWeekSub" data-page-node-id="MX5d9sHbHMsz0cIBxUDHyH">0/0</b></div>
+    </div>
+    <div class="stats-divider" data-page-node-id="Gyuje1Zu2tkpdXfjD9pFmw"></div>
+    <div class="ring-wrap" data-page-node-id="eqLNlpWunbAH9NS4Dn1cGy">
+      <div class="ring" data-page-node-id="qLEFoYMq3DXpJQSQiq7rz3">
+        <svg width="72" height="72" data-page-node-id="mgrnXuN9h6zCKng7YyXaZN">
+          <circle class="ring-bg" cx="36" cy="36" r="30" data-page-node-id="OmnYMAlPLV1yGVFNqziBGI"></circle>
+          <circle class="ring-fg" id="ringMonthFg" cx="36" cy="36" r="30" stroke="#ADD9BE" data-page-node-id="yQqX1p6mWdRe6o2XA4zIye"></circle>
+        </svg>
+        <div class="ring-pct" id="ringMonthPct" data-page-node-id="rKkuzWnS2BM2NOqTfGPc7B">0%</div>
+      </div>
+      <div class="ring-label" data-page-node-id="nAmzKSkaISOOGzyd4NWMfY">本月任务完成率<b id="ringMonthSub" data-page-node-id="2tAqUAoCtU1Wgv91nmElgW">0/0</b></div>
+    </div>
+  </div>
+
+  <div class="columns" data-page-node-id="oeZw3DskdSHm5cK85KFkDO">
+    <!-- 左：周打卡 -->
+    <div class="col" data-page-node-id="q081Xcch4tIK5uErCGrTGX">
+      <h2 data-page-node-id="s2GNtduMBKjk1HjLLZJek3">周打卡 <span class="hint" data-page-node-id="w2VkV5mAiD3YF5LiP5optI">点击圆点打卡</span></h2>
+      <div class="week-head" data-page-node-id="F81hgdRgIQe56X6xqPLjI9">
+        <div data-page-node-id="BEFkoWCEhCdCLVYJ7Fu4cy"></div>
+        <div data-page-node-id="X7XyuaKvAjCmBoD5o2i5Qt">一</div><div data-page-node-id="L9OjD53tUL3GqMwtogw9eK">二</div><div data-page-node-id="HOMYQBHBbH2zj65evGJfQz">三</div><div data-page-node-id="Dxy23VtJLnWen4s2vTYlqw">四</div><div data-page-node-id="Ul6iqbZI6gX9KodUczBPjT">五</div><div data-page-node-id="ZZx6lK1KC0WKYrSLVT75zC">六</div><div data-page-node-id="N31JlYMYdOuv4UCfSlHUkS">日</div>
+      </div>
+      <div id="habitList" data-page-node-id="J9KyQ83YJgPpG0xOLlkjCj"></div>
+      <div class="add-habit" data-page-node-id="Cd17QAEc9oD5R1XEzID61K">
+        <input id="habitInput" placeholder="新增习惯，如：喝水" data-page-node-id="9luJGA08BL8OJUVi3eNqd7">
+        <button class="btn" onclick="addHabit()" data-page-node-id="LdGW5TRPHCJ7PPry11C0q2">添加</button>
+      </div>
+    </div>
+
+    <!-- 中：任务清单 -->
+    <div class="col" data-page-node-id="qL7sDy4oE9WuoZlTO1aQ5K">
+      <h2 data-page-node-id="NRr9F2LLSrAMbfEl0bTIHY">日/周任务 <span class="hint" data-page-node-id="4G74Uz7JUrLJJDFtbeHiE6">勾选即完成</span></h2>
+      <div class="task-add" data-page-node-id="nB5e7oRtEoGX1EP2NOon5Q">
+        <input id="taskInput" placeholder="输入新任务，回车添加" data-page-node-id="sezV8ZbRBAMN5sEk6RyofB">
+        <button class="btn green" onclick="addTask()" data-page-node-id="uFLsvUKlcPXXyC7lc1jn0E">添加</button>
+      </div>
+      <div id="taskList" data-page-node-id="JEvu8T3o23AqtJrlBzhMdX"></div>
+    </div>
+
+    <!-- 右：月度日记 -->
+    <div class="col" data-page-node-id="Ix3g2HuQmOmBlgWtPXrQLL">
+      <h2 data-page-node-id="Wzvgdv2W8JYFC9cHAJA0Rs">月度日记 <span class="hint" data-page-node-id="DBOAslyoHxQcWedjFJKjpH">左右滑动翻页</span></h2>
+      <div class="diary-stage" data-page-node-id="VsC2PEx1RHjPpcfEa2cMtv">
+        <div class="diary-track" id="diaryTrack" data-page-node-id="fGLJtQo94tKRCwwSpCeSso"></div>
+      </div>
+      <div class="diary-nav" data-page-node-id="d9FAO6VrwlPDZhHJEdTXv7">
+        <button id="diaryPrev" onclick="diaryPrev()" data-page-node-id="hChKvkDKUD4IAhKUSKdV8g">‹ 上一页</button>
+        <span class="month" id="diaryMonth" data-page-node-id="iLH67X0KAQYqIaeMl2dEV6"></span>
+        <button id="diaryNext" onclick="diaryNext()" data-page-node-id="AbWNjwDU3VWTnKw2gAzFSc">下一页 ›</button>
+      </div>
+      <div class="diary-add" data-page-node-id="DdK1msqg3i7YKZygBNt0ch">
+        <textarea id="diaryText" placeholder="记录今天的一点小事…"></textarea>
+        <div class="row" data-page-node-id="3lwsEdqTHfQGFHQNI6XAtt">
+          <input type="file" id="diaryImg" accept="image/*" data-page-node-id="HjbA4dnZGUFT7qHuJpea7s">
+          <button class="btn" onclick="addDiary()" data-page-node-id="qEhXsq9nq5F2swxgIncXpR">保存日记</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PALETTE=[
+  {key:'pink',  light:'#F8E0E6', mid:'#E6B8C4'},
+  {key:'green', light:'#E0F0E6', mid:'#ADD9BE'},
+  {key:'yellow',light:'#F8F0E0', mid:'#E6D2A6'}
+];
+const DAYS=7;
+const STORE_KEY='pperson_workbench_v1';
+
+let state=loadState();
+let diaryIndex=0;
+
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function monthStr(s){return s.slice(0,7);}
+function thisMonth(){return monthStr(todayStr());}
+
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem(STORE_KEY));
+    if(s&&s.habits) return s;
+  }catch(e){}
+  return {
+    habits:[
+      {id:1,name:'喝水',color:0,days:[false,false,false,false,false,false,false]},
+      {id:2,name:'阅读',color:1,days:[false,false,false,false,false,false,false]},
+      {id:3,name:'运动',color:2,days:[false,false,false,false,false,false,false]},
+      {id:4,name:'早睡',color:0,days:[false,false,false,false,false,false,false]},
+      {id:5,name:'冥想',color:1,days:[false,false,false,false,false,false,false]}
+    ],
+    tasks:[],
+    diaries:[]
+  };
+}
+function save(){localStorage.setItem(STORE_KEY,JSON.stringify(state));}
+
+/* ---------- 周打卡 ---------- */
+function maxStreak(days){
+  let best=0,cur=0;
+  for(const d of days){if(d){cur++;best=Math.max(best,cur);}else cur=0;}
+  return best;
+}
+function renderHabits(){
+  const wrap=document.getElementById('habitList');wrap.innerHTML='';
+  state.habits.forEach(h=>{
+    const p=PALETTE[h.color%3];
+    const row=document.createElement('div');row.className='habit-row';
+    const name=document.createElement('div');name.className='habit-name';
+    name.innerHTML=`<span>${h.name}</span><span class="streak">连续${maxStreak(h.days)}天</span>`;
+    row.appendChild(name);
+    h.days.forEach((done,i)=>{
+      const dot=document.createElement('div');
+      dot.className='dot'+(done?' done':'');
+      if(done) dot.style.setProperty('--c',p.mid);
+      dot.onclick=()=>{h.days[i]=!h.days[i];save();renderHabits();updateStats();};
+      row.appendChild(dot);
+    });
+    wrap.appendChild(row);
+  });
+}
+function addHabit(){
+  const inp=document.getElementById('habitInput');
+  const v=inp.value.trim();if(!v)return;
+  state.habits.push({id:Date.now(),name:v,color:state.habits.length%3,days:Array(DAYS).fill(false)});
+  inp.value='';save();renderHabits();
+}
+
+/* ---------- 任务清单 ---------- */
+function renderTasks(){
+  const wrap=document.getElementById('taskList');wrap.innerHTML='';
+  const groups={};
+  state.tasks.forEach(t=>{(groups[t.date]=groups[t.date]||[]).push(t);});
+  const dates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+  if(dates.length===0){wrap.innerHTML='<div class="diary-empty">还没有任务，添加一条开始吧～</div>';return;}
+  dates.forEach(date=>{
+    const g=document.createElement('div');g.className='task-date-group';
+    const head=document.createElement('div');head.className='task-date';
+    head.textContent=date===todayStr()?'今天 · '+date:date;
+    g.appendChild(head);
+    groups[date].forEach(t=>{
+      const item=document.createElement('div');item.className='task-item';
+      const chk=document.createElement('div');chk.className='task-check'+(t.done?' done':'');
+      chk.onclick=()=>{t.done=!t.done;save();renderTasks();updateStats();};
+      const txt=document.createElement('div');txt.className='task-text'+(t.done?' done':'');
+      txt.textContent=t.text;
+      const del=document.createElement('button');del.className='task-del';del.textContent='×';
+      del.onclick=()=>{state.tasks=state.tasks.filter(x=>x.id!==t.id);save();renderTasks();updateStats();};
+      item.append(chk,txt,del);g.appendChild(item);
+    });
+    wrap.appendChild(g);
+  });
+}
+function addTask(){
+  const inp=document.getElementById('taskInput');
+  const v=inp.value.trim();if(!v)return;
+  state.tasks.push({id:Date.now(),text:v,date:todayStr(),done:false});
+  inp.value='';save();renderTasks();updateStats();
+}
+document.getElementById('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+
+/* ---------- 月度日记 ---------- */
+function renderDiary(){
+  const track=document.getElementById('diaryTrack');track.innerHTML='';
+  const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const mon=document.getElementById('diaryMonth');
+  if(list.length===0){
+    track.innerHTML='<div class="diary-card"><div class="diary-empty">本月还没有日记<br>在下方写下第一篇吧 🌿</div></div>';
+    mon.textContent=thisMonth();
+    diaryIndex=0;updateDiaryNav();return;
+  }
+  // 仅展示本月的日记，其余月份提示（按月份归档）
+  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());
+  const showList=monthList.length?monthList:list;
+  showList.forEach(d=>{
+    const card=document.createElement('div');card.className='diary-card';
+    const dt=document.createElement('div');dt.className='d-date';dt.textContent=d.date;
+    card.appendChild(dt);
+    if(d.image){
+      const img=document.createElement('img');img.className='d-img';img.src=d.image;card.appendChild(img);
+    }else{
+      const ph=document.createElement('div');ph.className='d-img-ph';ph.textContent='无图片';card.appendChild(ph);
+    }
+    const tx=document.createElement('div');tx.className='d-text';tx.textContent=d.text||'（无文字）';
+    card.appendChild(tx);
+    track.appendChild(card);
+  });
+  if(diaryIndex>=showList.length)diaryIndex=showList.length-1;
+  if(diaryIndex<0)diaryIndex=0;
+  mon.textContent=monthStr(showList[diaryIndex].date);
+  track.style.transform=`translateX(-${diaryIndex*100}%)`;
+  updateDiaryNav();
+}
+function updateDiaryNav(){
+  const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());
+  const n=monthList.length?monthList.length:list.length;
+  document.getElementById('diaryPrev').disabled=diaryIndex<=0;
+  document.getElementById('diaryNext').disabled=diaryIndex>=n-1;
+}
+function diaryPrev(){if(diaryIndex>0){diaryIndex--;renderDiary();}}
+function diaryNext(){const list=state.diaries.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const monthList=list.filter(d=>monthStr(d.date)===thisMonth());const n=monthList.length?monthList.length:list.length;
+  if(diaryIndex<n-1){diaryIndex++;renderDiary();}}
+function addDiary(){
+  const tx=document.getElementById('diaryText');
+  const file=document.getElementById('diaryImg');
+  const text=tx.value.trim();
+  if(!text&&!file.files.length){return;}
+  const entry={id:Date.now(),date:todayStr(),text};
+  if(file.files.length){
+    const reader=new FileReader();
+    reader.onload=()=>{entry.image=reader.result;state.diaries.push(entry);save();tx.value='';file.value='';diaryIndex=0;renderDiary();};
+    reader.readAsDataURL(file.files[0]);
+  }else{
+    state.diaries.push(entry);save();tx.value='';file.value='';diaryIndex=0;renderDiary();
+  }
+}
+// 触摸滑动翻页
+(function(){
+  const stage=document.querySelector('.diary-stage');
+  let sx=0,sy=0,moved=false;
+  stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
+  stage.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-sx)>10)moved=true;},{passive:true});
+  stage.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(e.changedTouches[0].clientY-sy)){
+      if(dx<0)diaryNext();else diaryPrev();
+    }
+  },{passive:true});
+})();
+
+/* ---------- 顶部统计 ---------- */
+function setRing(fgId,pctId,subId,pct,sub){
+  const C=2*Math.PI*30;
+  document.getElementById(fgId).style.strokeDasharray=C;
+  document.getElementById(fgId).style.strokeDashoffset=C*(1-pct/100);
+  document.getElementById(pctId).textContent=Math.round(pct)+'%';
+  document.getElementById(subId).textContent=sub;
+}
+function updateStats(){
+  // 本周打卡完成率
+  let total=0,done=0;
+  state.habits.forEach(h=>h.days.forEach(d=>{total++;if(d)done++;}));
+  const wp=total?done/total*100:0;
+  setRing('ringWeekFg','ringWeekPct','ringWeekSub',wp,`${done}/${total}`);
+  // 本月任务完成率
+  const mt=state.tasks.filter(t=>monthStr(t.date)===thisMonth());
+  const mtDone=mt.filter(t=>t.done).length;
+  const mp=mt.length?mtDone/mt.length*100:0;
+  setRing('ringMonthFg','ringMonthPct','ringMonthSub',mp,`${mtDone}/${mt.length}`);
+}
+
+/* 初始化 */
+renderHabits();
+renderTasks();
+renderDiary();
+updateStats();
+
+/* 注册 Service Worker（支持离线 / 添加到手机屏幕） */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

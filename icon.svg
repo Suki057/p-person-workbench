@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#FAF8F5"/>
+  <rect x="56" y="56" width="400" height="400" rx="72" fill="#ffffff" stroke="#EDE8E2" stroke-width="4"/>
+  <!-- 三个打卡圆 -->
+  <circle cx="170" cy="190" r="58" fill="#F8E0E6"/>
+  <circle cx="256" cy="190" r="58" fill="#E0F0E6"/>
+  <circle cx="342" cy="190" r="58" fill="#F8F0E0"/>
+  <g fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M148 190 l16 16 l26 -30"/>
+    <path d="M234 190 l16 16 l26 -30"/>
+    <path d="M320 190 l16 16 l26 -30"/>
+  </g>
+  <!-- 任务行 -->
+  <rect x="120" y="300" width="272" height="22" rx="11" fill="#E6B8C4"/>
+  <rect x="120" y="346" width="220" height="22" rx="11" fill="#ADD9BE"/>
+  <rect x="120" y="392" width="248" height="22" rx="11" fill="#E6D2A6"/>
+</svg>

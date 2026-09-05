@@ -1,0 +1,15 @@
+{
+  "name": "P人爆改J人 · 自律打卡",
+  "short_name": "自律打卡",
+  "description": "周打卡 · 任务清单 · 月度日记 自律工作台",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAF8F5",
+  "theme_color": "#E6B8C4",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
