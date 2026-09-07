@@ -273,6 +273,18 @@
   .modal-text{font-size:15px;line-height:1.75;color:#5a4a4a;font-family:var(--cartoon);white-space:pre-wrap;word-break:break-word;}
   .modal-empty{color:var(--done);font-size:13px;text-align:center;padding:30px 0;}
 
+  /* 修改标题弹窗 */
+  .edit-mask{position:fixed;inset:0;z-index:330;display:flex;align-items:center;justify-content:center;background:rgba(45,30,35,.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:24px;}
+  .edit-mask[hidden]{display:none;}
+  .edit-card{width:100%;max-width:320px;background:var(--glass-strong);border:1px solid rgba(255,255,255,.85);border-radius:22px;padding:22px 20px;box-shadow:0 20px 50px rgba(0,0,0,.3);animation:pop .22s ease;}
+  .edit-card .etitle{font-family:var(--cartoon);font-size:16px;color:#5a4a4a;margin-bottom:14px;text-align:center;font-weight:600;}
+  .edit-card .edit-input{width:100%;margin-bottom:18px;font-family:var(--cartoon);font-size:15px;}
+  .edit-btns{display:flex;gap:10px;}
+  .edit-btns button{flex:1;border:none;border-radius:14px;padding:11px 0;font-size:14px;cursor:pointer;font-family:var(--cartoon);transition:transform .15s,opacity .2s;}
+  .edit-btns .e-cancel{background:rgba(255,255,255,.7);color:#7a6a6a;}
+  .edit-btns .e-ok{background:var(--pink-mid);color:#fff;box-shadow:0 4px 12px rgba(242,103,116,.3);}
+  .edit-btns button:active{transform:scale(.96);}
+
   /* 手帐事件删除按钮 */
   .ev-del{
     position:absolute;top:6px;right:8px;border:none;background:rgba(255,255,255,0.8);
@@ -442,6 +454,18 @@
     </div>
   </div>
 
+  <!-- 修改标题弹窗 -->
+  <div class="edit-mask" id="editDialog" hidden>
+    <div class="edit-card">
+      <div class="etitle">修改习惯名称</div>
+      <input type="text" id="editInput" class="edit-input" placeholder="输入新的习惯名称">
+      <div class="edit-btns">
+        <button class="e-cancel" onclick="cancelEdit()">取消</button>
+        <button class="e-ok" onclick="doEdit()">确认</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="tabbar" data-page-node-id="o6TDwP9snK3UWmuUSSCcDf">
     <button class="tab active" data-tab="progress" onclick="switchTab('progress')" data-page-node-id="Us20TSshgYDSEcjGvUMumv"><span class="ico" data-page-node-id="0a1OHAkUJkAhjZjzNtFOqn">📊</span>打卡进度</button>
     <button class="tab" data-tab="weekcheck" onclick="switchTab('weekcheck')" data-page-node-id="cIDZfzmfm73ZELAvMGxhtY"><span class="ico" data-page-node-id="hvlBHPXSAWOYT62eUFio0G">✅</span>周打卡</button>
@@ -520,10 +544,12 @@ function renderHabits(){
     const p=PALETTE[h.color%3];
     const row=document.createElement('div');row.className='habit-row';
     const name=document.createElement('div');name.className='habit-name';
-    name.innerHTML=`<div class="nm-block"><span class="nm">${escapeHtml(h.name)}</span><span class="streak">连续${maxStreak(h.days)}天</span></div>`;
+    const nmBlock=document.createElement('div');nmBlock.className='nm-block';
+    nmBlock.innerHTML=`<span class="nm">${escapeHtml(h.name)}</span><span class="streak">连续${maxStreak(h.days)}天</span>`;
+    name.appendChild(nmBlock);
     const del=document.createElement('button');del.className='habit-del';del.textContent='×';
     del.title='删除该习惯（可到回收站恢复）';
-    del.onclick=(e)=>{e.stopPropagation();delHabit(h.id);};
+    del.onclick=(e)=>{e.stopPropagation();confirmDelete(e,'habit',h.id);};
     name.appendChild(del);
     row.appendChild(name);
     h.days.forEach((done,i)=>{
@@ -533,10 +559,18 @@ function renderHabits(){
       dot.onclick=()=>{h.days[i]=!h.days[i];save();renderHabits();updateStats();};
       row.appendChild(dot);
     });
-    // 长按 450ms 显示删除按钮（移动端），松开即隐藏
-    let lp=null;
-    row.addEventListener('touchstart',()=>{lp=setTimeout(()=>row.classList.add('show-del'),450);},{passive:true});
-    ['touchend','touchmove','touchcancel'].forEach(ev=>row.addEventListener(ev,()=>{if(lp){clearTimeout(lp);lp=null;}},{passive:true}));
+    // 长按 450ms 切换删除按钮显隐（移动端）：长按出现❌，再次长按隐藏
+    let lpTimer=null;
+    row.addEventListener('touchstart',()=>{lpTimer=setTimeout(()=>row.classList.toggle('show-del'),450);},{passive:true});
+    ['touchend','touchmove','touchcancel'].forEach(ev=>row.addEventListener(ev,()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}},{passive:true}));
+    // 双击标题（桌面 dblclick / 移动端双触）进入修改名称
+    let lastTap=0;
+    nmBlock.addEventListener('dblclick',()=>editHabitName(h.id));
+    nmBlock.addEventListener('touchend',()=>{
+      const now=Date.now();
+      if(now-lastTap<300){editHabitName(h.id);lastTap=0;}
+      else lastTap=now;
+    },{passive:true});
     wrap.appendChild(row);
   });
 }
@@ -943,7 +977,10 @@ let pendingDelete=null;
 function confirmDelete(ev, type, id){
   if(ev&&ev.stopPropagation)ev.stopPropagation();
   pendingDelete={type,id};
-  document.getElementById('confirmMsg').textContent = type==='diary'?'确定要删除这篇日记吗？':'确定要删除这条记录吗？';
+  document.getElementById('confirmMsg').textContent =
+    type==='diary'?'确定要删除这篇日记吗？':
+    type==='habit'?'确定要删除这个习惯吗？删除后可到回收站恢复。':
+    '确定要删除这条记录吗？';
   document.getElementById('confirmDialog').hidden=false;
 }
 function doConfirmDelete(){
@@ -952,6 +989,7 @@ function doConfirmDelete(){
   pendingDelete=null;
   document.getElementById('confirmDialog').hidden=true;
   if(type==='diary')delDiary(id);
+  else if(type==='habit')delHabit(id);
   else delTaskFromPlanner(id);
 }
 function cancelConfirmDelete(){
@@ -960,6 +998,36 @@ function cancelConfirmDelete(){
 }
 // 点击确认框空白处 = 取消
 document.getElementById('confirmDialog').addEventListener('click',e=>{if(e.target.id==='confirmDialog')cancelConfirmDelete();});
+
+/* ---------- 修改习惯标题 ---------- */
+let editingHabitId=null;
+function editHabitName(id){
+  const h=state.habits.find(x=>x.id===id);if(!h)return;
+  editingHabitId=id;
+  const inp=document.getElementById('editInput');
+  inp.value=h.name;
+  document.getElementById('editDialog').hidden=false;
+  // 打开编辑时收起所有❌，避免叠加
+  document.querySelectorAll('.habit-row').forEach(r=>r.classList.remove('show-del'));
+  setTimeout(()=>inp.focus(),50);
+}
+function doEdit(){
+  if(editingHabitId==null)return;
+  const inp=document.getElementById('editInput');
+  const v=inp.value.trim();
+  if(v){
+    const h=state.habits.find(x=>x.id===editingHabitId);
+    if(h){h.name=v;save();renderHabits();updateStats();}
+  }
+  closeEdit();
+}
+function cancelEdit(){closeEdit();}
+function closeEdit(){
+  editingHabitId=null;
+  document.getElementById('editDialog').hidden=true;
+}
+document.getElementById('editDialog').addEventListener('click',e=>{if(e.target.id==='editDialog')cancelEdit();});
+document.getElementById('editInput').addEventListener('keydown',e=>{if(e.key==='Enter')doEdit();});
 // 触摸滑动翻页
 (function(){
   const stage=document.getElementById('diaryPaper');
