@@ -391,7 +391,7 @@
           <label class="da-file-btn" data-page-node-id="rRFQHW7HrE7fP9NM6Ci0MU">📎 图片
             <input type="file" id="diaryImg" accept="image/*" multiple hidden>
           </label>
-          <button class="btn" onclick="addDiary()" data-page-node-id="eXB9M8IsB6GbcjKZoGql21">保存</button>
+          <button class="btn" id="saveDiaryBtn" onclick="addDiary()" data-page-node-id="eXB9M8IsB6GbcjKZoGql21">保存</button>
         </div>
         <div class="da-files" id="diaryFileChips" data-page-node-id="F1cVy2pWq2Xn4mR8sT0aBc"></div>
       </div>
@@ -481,7 +481,13 @@ function loadState(){
     trash:[]
   };
 }
-function save(){localStorage.setItem(STORE_KEY,JSON.stringify(state));}
+function save(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}
+  catch(e){
+    console.error('save failed',e);
+    alert('保存失败：本地存储空间不足。建议删除部分带大图的旧日记，或减小图片尺寸。');
+  }
+}
 
 /* ---------- 底部 tab 切换 ---------- */
 function switchTab(name){
@@ -756,25 +762,89 @@ function toggleTask(id){
 }
 function focusDiary(){document.getElementById('diaryText').focus();}
 let selectedDiaryFiles=[];
+let diarySaving=false;
+// 压缩图片：最大边 maxDim，输出 JPEG/质量 q，大幅减小 localStorage 体积（写入更快、不爆配额）
+function downscaleImage(file, maxDim, q, cb){
+  if(!file.type || !file.type.startsWith('image/')){
+    const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file);return;
+  }
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{
+    const scale=Math.min(1, maxDim/Math.max(img.width,img.height));
+    const nw=Math.max(1,Math.round(img.width*scale)), nh=Math.max(1,Math.round(img.height*scale));
+    const canvas=document.createElement('canvas');canvas.width=nw;canvas.height=nh;
+    canvas.getContext('2d').drawImage(img,0,0,nw,nh);
+    URL.revokeObjectURL(url);
+    const useJpeg = file.type!=='image/png';
+    canvas.toBlob(b=>{
+      if(!b){const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file);return;}
+      const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(b);
+    }, useJpeg?'image/jpeg':'image/png', useJpeg?q:undefined);
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file);};
+  img.src=url;
+}
 function addDiary(){
+  if(diarySaving) return;                 // 防止连点产生重复日记
+  const btn=document.getElementById('saveDiaryBtn');
   const tx=document.getElementById('diaryText');
   const text=tx.value.trim();
   if(!text && selectedDiaryFiles.length===0) return;
+  diarySaving=true;
+  if(btn){btn.disabled=true;btn.textContent='保存中…';}
   const entry={id:Date.now(),date:selectedDate,text,images:[]};
   const files=selectedDiaryFiles.slice();
-  const done=()=>{
+  const finish=()=>{
     state.diaries.unshift(entry);save();   // 新日记置顶显示
     tx.value='';clearDiaryFile();          // 输入与图片恢复默认状态
     renderPlanner();renderTasks();updateStats();
+    setTimeout(()=>{                       // 400ms 冷却：期间按钮仍禁用，杜绝连点产生重复日记
+      diarySaving=false;
+      if(btn){btn.disabled=false;btn.textContent='保存';}
+    },400);
   };
   if(files.length){
     let loaded=0;
-    files.forEach(f=>{
-      const reader=new FileReader();
-      reader.onload=()=>{entry.images.push(reader.result);loaded++;if(loaded===files.length)done();};
-      reader.readAsDataURL(f);
-    });
-  }else done();
+    files.forEach(f=>downscaleImage(f,1280,0.82,data=>{
+      entry.images.push(data);loaded++;
+      if(loaded===files.length)finish();
+    }));
+  }else finish();
+}
+// 把已存的大图重新压缩（启动时迁移一次，避免旧数据拖慢保存/删除）
+function recompressDataUrl(src,maxDim,q){
+  return new Promise(res=>{
+    if(!src||!src.startsWith('data:image')){res(src);return;}
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxDim/Math.max(img.width,img.height));
+      const nw=Math.max(1,Math.round(img.width*scale)), nh=Math.max(1,Math.round(img.height*scale));
+      const c=document.createElement('canvas');c.width=nw;c.height=nh;
+      c.getContext('2d').drawImage(img,0,0,nw,nh);
+      const useJpeg=!src.startsWith('data:image/png');
+      c.toBlob(b=>{if(!b){res(src);return;}const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(b);},useJpeg?'image/jpeg':'image/png',useJpeg?q:undefined);
+    };
+    img.onerror=()=>res(src);
+    img.src=src;
+  });
+}
+async function migrateLargeImages(){
+  if(state.migratedV1) return;
+  state.migratedV1=true;
+  let changed=false;
+  for(const d of state.diaries){
+    const imgs=(d.images&&d.images.length)?d.images:(d.image?[d.image]:[]);
+    if(!imgs.length) continue;
+    const out=[];
+    for(const s of imgs){
+      if(s&&s.length>600000){const c=await recompressDataUrl(s,1280,0.82);if(c!==s)changed=true;out.push(c);}
+      else out.push(s);
+    }
+    d.images=out; if(d.image) delete d.image;
+  }
+  if(changed){save();renderPlanner();updateStats();}
+  else save(); // 记下迁移标记，下次不再跑
 }
 // 选取图片后显示可删除的 chip（支持多张）
 function showDiaryFileChip(){
@@ -889,6 +959,7 @@ renderHabits();
 renderTasks();
 renderPlanner();
 updateStats();
+migrateLargeImages();   // 后台把旧的大图压缩，整体读写更快（不阻塞界面）
 
 /* 注册 Service Worker（支持离线 / 添加到手机屏幕） */
 if('serviceWorker' in navigator){
