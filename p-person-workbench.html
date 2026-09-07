@@ -1014,7 +1014,14 @@ migrateLargeImages();   // 后台把旧的大图压缩，整体读写更快（�
 /* 注册 Service Worker（支持离线 / 添加到手机屏幕） */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      if(reg && reg.update) reg.update();   // 主动检查新版本
+      const hadController = !!navigator.serviceWorker.controller;
+      // 新 SW 接管页面后，自动刷新一次以加载最新内容（首次注册不触发，避免无谓刷新）
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{
+        if(hadController) window.location.reload();
+      });
+    }).catch(()=>{});
   });
 }
 </script>
