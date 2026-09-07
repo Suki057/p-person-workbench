@@ -1,45 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FBDDE6"/>
-      <stop offset="0.5" stop-color="#F3E6EC"/>
-      <stop offset="1" stop-color="#F7EEDC"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset="0.55" stop-color="#FFD9DE"/>
+      <stop offset="1" stop-color="#FFC2CB"/>
     </linearGradient>
-    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ADD9BE"/>
-      <stop offset="1" stop-color="#E6B8C4"/>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE45C"/>
+      <stop offset="1" stop-color="#FFC400"/>
     </linearGradient>
-    <radialGradient id="badge" cx="0.36" cy="0.30" r="0.9">
-      <stop offset="0" stop-color="#C2E6CF"/>
-      <stop offset="1" stop-color="#9CCBAA"/>
+    <linearGradient id="check" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7BE08A"/>
+      <stop offset="1" stop-color="#54B463"/>
+    </linearGradient>
+    <radialGradient id="soft" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
-    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#C9A9B4" flood-opacity="0.35"/>
-    </filter>
   </defs>
 
-  <!-- 背景圆角瓷砖 -->
-  <rect width="512" height="512" rx="116" fill="url(#tile)"/>
+  <!-- 圆角瓷砖底 -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#soft)"/>
 
-  <!-- 进度环 + 完成徽章 -->
-  <g filter="url(#soft)">
-    <circle cx="256" cy="244" r="150" fill="#FFFFFF"/>
-    <!-- 进度弧（约 75%） -->
-    <circle cx="256" cy="244" r="120" fill="none" stroke="url(#ring)" stroke-width="20"
-            stroke-linecap="round" stroke-dasharray="754" stroke-dashoffset="190"
-            transform="rotate(-90 256 244)"/>
-    <!-- 中心完成徽章 -->
-    <circle cx="256" cy="244" r="92" fill="url(#badge)"/>
-    <!-- 对勾 -->
-    <path d="M214 250 l30 32 l58 -74" fill="none" stroke="#FFFFFF" stroke-width="20"
-          stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 进度环（蜡笔红→蓝渐变弧） -->
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="22"/>
+  <path d="M256 60 A196 196 0 1 1 78 196" fill="none" stroke="#F26774" stroke-width="22" stroke-linecap="round"/>
+  <path d="M78 196 A196 196 0 0 1 256 60" fill="none" stroke="#5C9DF2" stroke-width="22" stroke-linecap="round" stroke-opacity="0.9"/>
+
+  <!-- 白色圆牌 -->
+  <circle cx="256" cy="256" r="150" fill="#ffffff" opacity="0.96"/>
+
+  <!-- 卡通向日葵（蜡笔小新春日部风） -->
+  <g transform="translate(256 256)">
+    <g>
+      <g fill="url(#sun)" stroke="#E8A900" stroke-width="4">
+        <ellipse cx="0" cy="-78" rx="17" ry="34"/>
+        <ellipse cx="0" cy="78" rx="17" ry="34"/>
+        <ellipse cx="-78" cy="0" rx="34" ry="17"/>
+        <ellipse cx="78" cy="0" rx="34" ry="17"/>
+        <ellipse cx="-55" cy="-55" rx="16" ry="32" transform="rotate(45)"/>
+        <ellipse cx="55" cy="-55" rx="16" ry="32" transform="rotate(-45)"/>
+        <ellipse cx="-55" cy="55" rx="16" ry="32" transform="rotate(-45)"/>
+        <ellipse cx="55" cy="55" rx="16" ry="32" transform="rotate(45)"/>
+      </g>
+    </g>
+    <circle cx="0" cy="0" r="48" fill="url(#sun)" stroke="#E8A900" stroke-width="4"/>
+    <!-- 笑脸 -->
+    <circle cx="-16" cy="-8" r="6" fill="#5a3d00"/>
+    <circle cx="16" cy="-8" r="6" fill="#5a3d00"/>
+    <path d="M-18 14 Q0 34 18 14" fill="none" stroke="#5a3d00" stroke-width="5" stroke-linecap="round"/>
   </g>
 
   <!-- 三个习惯小圆点 -->
-  <circle cx="198" cy="430" r="20" fill="#E6B8C4"/>
-  <circle cx="256" cy="430" r="20" fill="#ADD9BE"/>
-  <circle cx="314" cy="430" r="20" fill="#E6D2A6"/>
-
-  <!-- 潮流小闪星 -->
-  <path d="M398 118 l8 22 22 8 -22 8 -8 22 -8 -22 -22 -8 22 -8 z" fill="#FFFFFF" opacity="0.92"/>
+  <circle cx="120" cy="410" r="20" fill="#F26774"/>
+  <circle cx="170" cy="410" r="20" fill="#54B463"/>
+  <circle cx="220" cy="410" r="20" fill="#FFC83D"/>
+  <!-- 闪星点缀 -->
+  <path d="M400 120 l8 18 18 8 -18 8 -8 18 -8 -18 -18 -8 18 -8 z" fill="#ffffff" opacity="0.9"/>
 </svg>
