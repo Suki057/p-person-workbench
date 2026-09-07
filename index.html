@@ -139,6 +139,7 @@
   .planner-right{
     border-radius:0 8px 8px 0;margin-right:8px;
     transform:rotateY(-2deg);transform-origin:left center;
+    backface-visibility:hidden;
     box-shadow:inset 8px 0 18px rgba(0,0,0,0.04), -2px 0 6px rgba(0,0,0,0.04);
   }
 
@@ -483,7 +484,28 @@ function renderPlanner(){
   monthLabel.textContent=selectedDate.slice(0,7)+' · '+dayName(selectedDate);
   updateDiaryNav();
 }
-function selectDate(date){selectedDate=date;renderPlanner();}
+let plannerFlipLock=false;
+function flipTo(date, dir){
+  if(plannerFlipLock||date===selectedDate)return;
+  const right=document.getElementById('plannerRight');
+  plannerFlipLock=true;
+  right.style.transition='transform .32s ease-in';
+  right.style.transform='rotateY('+(dir>0?-150:150)+'deg)'; // 当前页绕书脊翻折离开
+  setTimeout(()=>{
+    selectedDate=date;renderPlanner(); // 换内容
+    right.style.transition='none';
+    right.style.transform='rotateY('+(dir>0?150:-150)+'deg)'; // 从另一侧预备进入
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      right.style.transition='transform .32s ease-out';
+      right.style.transform='rotateY(-2deg)'; // 转回微张原位
+    }));
+    setTimeout(()=>{plannerFlipLock=false;},340);
+  },320);
+}
+function selectDate(date){
+  const dir=date>selectedDate?1:(date<selectedDate?-1:0);
+  flipTo(date,dir);
+}
 function updateDiaryNav(){
   const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
   document.getElementById('diaryPrev').disabled=idx<=0;
@@ -491,11 +513,11 @@ function updateDiaryNav(){
 }
 function diaryPrev(){
   const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
-  if(idx>0){selectedDate=week[idx-1];renderPlanner();}
+  if(idx>0){flipTo(week[idx-1],-1);}
 }
 function diaryNext(){
   const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
-  if(idx<week.length-1){selectedDate=week[idx+1];renderPlanner();}
+  if(idx<week.length-1){flipTo(week[idx+1],1);}
 }
 function toggleTask(id){
   const t=state.tasks.find(x=>x.id===id);
