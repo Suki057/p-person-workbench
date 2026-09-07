@@ -254,7 +254,10 @@
   .img-lightbox{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,12,16,.85);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:20px;}
   .img-lightbox[hidden]{display:none;}
   .img-lightbox img{max-width:100%;max-height:90vh;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.5);}
-  .img-lightbox .lb-close{position:absolute;top:18px;right:18px;border:none;background:rgba(255,255,255,.92);color:#5a4a4a;border-radius:50%;width:40px;height:40px;font-size:22px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+  .img-lightbox .lb-close{position:absolute;top:18px;right:18px;border:none;background:rgba(255,255,255,.92);color:#5a4a4a;border-radius:50%;width:40px;height:40px;font-size:22px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:2;}
+  .img-lightbox .lb-cap{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;background:rgba(0,0,0,.45);padding:4px 12px;border-radius:12px;font-family:var(--cartoon);}
+  .img-lightbox .lb-toast{position:absolute;left:50%;bottom:48px;transform:translateX(-50%);color:#fff;font-size:13px;background:rgba(0,0,0,.6);padding:8px 16px;border-radius:14px;font-family:var(--cartoon);white-space:nowrap;transition:opacity .2s;animation:lbToastIn .2s ease;}
+  @keyframes lbToastIn{from{opacity:0;transform:translateX(-50%) translateY(8px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
   /* 删除确认弹窗 */
   .confirm-mask{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;background:rgba(45,30,35,.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:24px;}
   .confirm-mask[hidden]{display:none;}
@@ -420,6 +423,8 @@
   <div class="img-lightbox" id="imgLightbox" hidden>
     <button class="lb-close" onclick="closeImageLightbox()">×</button>
     <img id="imgLightboxSrc" src="" alt="查看大图">
+    <div class="lb-cap" id="lbCap"></div>
+    <div class="lb-toast" id="lbToast" hidden></div>
   </div>
 
   <!-- 删除确认弹窗 -->
@@ -880,14 +885,56 @@ function closeDiary(){document.getElementById('diaryModal').hidden=true;}
 // 点击遮罩空白处关闭
 document.getElementById('diaryModal').addEventListener('click',e=>{if(e.target.id==='diaryModal')closeDiary();});
 // 图片放大查看（点击缩略图）
+let currentLightboxIdx=-1;
+let lbToastTimer=null;
+let lbSwiped=false;
+function showLbToast(msg){
+  const t=document.getElementById('lbToast');
+  t.textContent=msg;t.hidden=false;
+  if(lbToastTimer)clearTimeout(lbToastTimer);
+  lbToastTimer=setTimeout(()=>{t.hidden=true;},1200);
+}
+function updateLbCap(){
+  const cap=document.getElementById('lbCap');
+  if(!cap)return;
+  cap.textContent=currentModalImgs.length>1?`${currentLightboxIdx+1} / ${currentModalImgs.length}`:'';
+}
 function openImageLightbox(idx){
+  if(idx===undefined||idx===null)idx=currentLightboxIdx<0?0:currentLightboxIdx;
   const src=currentModalImgs[idx];if(!src)return;
+  currentLightboxIdx=idx;
   document.getElementById('imgLightboxSrc').src=src;
+  updateLbCap();
   document.getElementById('imgLightbox').hidden=false;
 }
-function closeImageLightbox(){document.getElementById('imgLightbox').hidden=true;}
+function lbNext(){
+  if(currentModalImgs.length===0)return;
+  if(currentLightboxIdx<currentModalImgs.length-1){openImageLightbox(currentLightboxIdx+1);}
+  else{showLbToast('已到最后一张');}
+}
+function lbPrev(){
+  if(currentModalImgs.length===0)return;
+  if(currentLightboxIdx>0){openImageLightbox(currentLightboxIdx-1);}
+  else{showLbToast('已经是第一张');}
+}
+function closeImageLightbox(){document.getElementById('imgLightbox').hidden=true;currentLightboxIdx=-1;}
+// 触摸滑动切换（左滑=下一张，右滑=上一张）
+(function(){
+  const box=document.getElementById('imgLightbox');
+  let sx=0,sy=0;
+  box.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  box.addEventListener('touchmove',e=>{},{passive:true});
+  box.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    const dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)){
+      lbSwiped=true;setTimeout(()=>{lbSwiped=false;},350);
+      if(dx<0)lbNext();else lbPrev();
+    }
+  },{passive:true});
+})();
 // 点击放大层空白处关闭
-document.getElementById('imgLightbox').addEventListener('click',e=>{if(e.target.id==='imgLightbox')closeImageLightbox();});
+document.getElementById('imgLightbox').addEventListener('click',e=>{if(lbSwiped)return;if(e.target.id==='imgLightbox')closeImageLightbox();});
 // 删除确认（确定/取消）
 let pendingDelete=null;
 function confirmDelete(ev, type, id){
