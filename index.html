@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html lang="zh-CN" data-page-node-id="YZfBsPQoFfBul8gx7FskCu">
+<head data-page-node-id="wRk0fLh1cLCkckHUAleEXx">
+<meta charset="UTF-8" data-page-node-id="04SfQuvYqhuTD7A2ylUirN">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="BNwPDSk771bJxvzqWtRRtU">
 <title>自律打卡</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="自律打卡">
-<meta name="theme-color" content="#E6B8C4">
+<link rel="manifest" href="manifest.webmanifest" data-page-node-id="Ma6323kdk5lhdaVYUZWpcY">
+<link rel="apple-touch-icon" href="icon.svg" data-page-node-id="cwWMgtWz5u4B1VfOuAi6e2">
+<meta name="mobile-web-app-capable" content="yes" data-page-node-id="gCINQ1BD9ZHWfGjQjgdkBr">
+<meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="OxPPRp5alpjJY6CrazxHBG">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" data-page-node-id="ZwXEDasIX6ytswAhCb4eGl">
+<meta name="apple-mobile-web-app-title" content="自律打卡" data-page-node-id="TRaqq3GS6XExb3KCqALkPs">
+<meta name="theme-color" content="#E6B8C4" data-page-node-id="gbPP0yaRAgPuUqxWAy4d9L">
 <style>
   :root{
     --bg:#FAF8F5;
@@ -66,7 +66,9 @@
   .ring-lg .ring-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#5a5347;}
   .ring-lg .ring-pct small{font-size:11px;font-weight:400;color:var(--done);margin-top:2px;}
   .summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
-  .sum-item{background:var(--bg);border-radius:var(--radius);padding:14px 8px;text-align:center;}
+  .sum-item{background:var(--bg);border-radius:var(--radius);padding:14px 8px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+  .sum-item:active{transform:scale(.96);}
+  .sum-item:hover{box-shadow:0 2px 10px rgba(0,0,0,.08);}
   .sum-item .num{font-size:22px;font-weight:700;color:#5a5347;line-height:1.1;}
   .sum-item .lbl{font-size:12px;color:var(--done);margin-top:4px;}
 
@@ -203,98 +205,98 @@
   }
 </style>
 </head>
-<body>
-<div class="app">
-  <header class="topbar">
-    <h1>自律打卡</h1>
-    <div class="sub">用一点秩序，爆改散漫的自己 🌿</div>
+<body data-page-node-id="CFBLZwWP2khcMSEfYP1oIj">
+<div class="app" data-page-node-id="XbFrSPvVhEAHi4Fb7sMQBL">
+  <header class="topbar" data-page-node-id="Gthjs2qlxpMIcnNbCaPJkH">
+    <h1 data-page-node-id="8LHZ7XwXTgXy52TXy8SnK6">自律打卡</h1>
+    <div class="sub" data-page-node-id="8HcAuiIaVAPgAcVBrraAFX">用一点秩序，爆改散漫的自己 🌿</div>
   </header>
 
-  <main class="pages">
+  <main class="pages" data-page-node-id="I6TBRiPCZCpQcPg1yuw5sX">
     <!-- 打卡进度 -->
-    <section class="page active" id="page-progress">
-      <div class="card">
-        <div class="progress-rings">
-          <div class="ring-lg">
-            <svg width="108" height="108"><circle class="ring-bg" cx="54" cy="54" r="46"/><circle class="ring-fg" id="ringWeekFg" cx="54" cy="54" r="46" stroke="#E6B8C4"/></svg>
-            <div class="ring-pct"><span id="ringWeekPct">0%</span><small>本周打卡</small></div>
+    <section class="page active" id="page-progress" data-page-node-id="t0AwBGFK3iE09Bbr9A6HBO">
+      <div class="card" data-page-node-id="iQpO13VqzG1s3TRVAfOjlf">
+        <div class="progress-rings" data-page-node-id="w1cCFI5PxCSjFMuEGpQqKQ">
+          <div class="ring-lg" data-page-node-id="HfTFB8iPT0GBeCbBvsp5R0">
+            <svg width="108" height="108" data-page-node-id="8OzeoCkYr3kjJtK3y1wo5C"><circle class="ring-bg" cx="54" cy="54" r="46" data-page-node-id="5eFmpSicUVCH9UrdIsm1Bn"/><circle class="ring-fg" id="ringWeekFg" cx="54" cy="54" r="46" stroke="#E6B8C4" data-page-node-id="HWfRCihh4FFM6HvNuNMYDH"/></svg>
+            <div class="ring-pct" data-page-node-id="iwO9PEdgGIeoz5axhbMvtz"><span id="ringWeekPct" data-page-node-id="Gn4UHZnhTfxaFlFPkzIFN3">0%</span><small data-page-node-id="2E3V4NVThQwISKkVMw49jX">本周打卡</small></div>
           </div>
-          <div class="ring-lg">
-            <svg width="108" height="108"><circle class="ring-bg" cx="54" cy="54" r="46"/><circle class="ring-fg" id="ringMonthFg" cx="54" cy="54" r="46" stroke="#ADD9BE"/></svg>
-            <div class="ring-pct"><span id="ringMonthPct">0%</span><small>本月任务</small></div>
+          <div class="ring-lg" data-page-node-id="xZLOwyVFDGAypYYoMcSdxM">
+            <svg width="108" height="108" data-page-node-id="4Zer3tDTv4WuZcdFWYnDAk"><circle class="ring-bg" cx="54" cy="54" r="46" data-page-node-id="FxlumL4cSs7Z7PBSWiQ5zG"/><circle class="ring-fg" id="ringMonthFg" cx="54" cy="54" r="46" stroke="#ADD9BE" data-page-node-id="BZGMqD2S5GITG83wCvQquz"/></svg>
+            <div class="ring-pct" data-page-node-id="agoPAtPLL7pAWCOPII4aWt"><span id="ringMonthPct" data-page-node-id="6evIkHrfrhLQl348LtvhfK">0%</span><small data-page-node-id="fSirJg1AUwRZandOHROE53">本月任务</small></div>
           </div>
         </div>
-        <div class="summary">
-          <div class="sum-item"><div class="num" id="sumStreak">0</div><div class="lbl">最长连续打卡(天)</div></div>
-          <div class="sum-item"><div class="num" id="sumHabits">0</div><div class="lbl">习惯数量</div></div>
-          <div class="sum-item"><div class="num" id="sumTasks">0/0</div><div class="lbl">本月任务完成</div></div>
-          <div class="sum-item"><div class="num" id="sumDiary">0</div><div class="lbl">本月日记(篇)</div></div>
+        <div class="summary" data-page-node-id="1wGia9pLdbR1x1V25G0JqL">
+          <div class="sum-item" onclick="switchTab('weekcheck')" data-page-node-id="vMgUBP2VTRgpiyPTXis4B3"><div class="num" id="sumStreak" data-page-node-id="5SejX7w4EHX1EHYIHFIgdd">0</div><div class="lbl" data-page-node-id="y7CKHManKpqqwiAQd0dcgq">最长连续打卡(天)</div></div>
+          <div class="sum-item" onclick="switchTab('weekcheck')" data-page-node-id="pXaTEqCdH05QUCYo5dHAQK"><div class="num" id="sumHabits" data-page-node-id="OcoiZgrJyF1yR7bOZdrV9D">0</div><div class="lbl" data-page-node-id="3Mls2QVEg6H5hqUkkF53yp">习惯数量</div></div>
+          <div class="sum-item" onclick="switchTab('tasks')" data-page-node-id="ZBLE6m1PFFKcKRGbRPArZn"><div class="num" id="sumTasks" data-page-node-id="hXtySDDuoJtef8wAHXQUom">0/0</div><div class="lbl" data-page-node-id="bWt0sldPqHsY8oExG5oMbs">本月任务完成</div></div>
+          <div class="sum-item" onclick="switchTab('planner')" data-page-node-id="mc2judd4oAgVc1SSohJ3Re"><div class="num" id="sumDiary" data-page-node-id="nq0qoIAY14CDHrm7xHm3Po">0</div><div class="lbl" data-page-node-id="qyK16CHVvofq4ZkgtfelWm">本月日记(篇)</div></div>
         </div>
       </div>
     </section>
 
     <!-- 周打卡 -->
-    <section class="page" id="page-weekcheck">
-      <div class="card">
-        <h2>周打卡 <span class="hint">点击圆点打卡</span></h2>
-        <div class="week-head"><div></div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>
-        <div id="habitList"></div>
-        <div class="add-habit">
-          <input id="habitInput" placeholder="新增习惯，如：喝水">
-          <button class="btn" onclick="addHabit()">添加</button>
+    <section class="page" id="page-weekcheck" data-page-node-id="iXddUBPAvJlOWEwQaLJbGe">
+      <div class="card" data-page-node-id="hjWm5w3E2QNIbbRUKecwgs">
+        <h2 data-page-node-id="lMBAFHn5EiJeVm98lXl7aI">周打卡 <span class="hint" data-page-node-id="dsajG92vRg4ZeF55L8tMGj">点击圆点打卡</span></h2>
+        <div class="week-head" data-page-node-id="mQtqzXnZKK07Bpjm3D2OVA"><div data-page-node-id="IjbCkTII2IgPDUMywELXno"></div><div data-page-node-id="jDh7x5bVaCW8Xy9NkZerRm">一</div><div data-page-node-id="niC1sl6qZwAORRbYtmi29i">二</div><div data-page-node-id="OipYJdjxEZlQz42b5x8t8j">三</div><div data-page-node-id="RKKpwiCklfaEP8VUeWWMtr">四</div><div data-page-node-id="h6rKBNVA64DR91L8h6aO31">五</div><div data-page-node-id="Oa2Zl5XSUiWbMiHaP1qb62">六</div><div data-page-node-id="kq4s2god7l2POjJDVHjYcB">日</div></div>
+        <div id="habitList" data-page-node-id="VTwMknJnGqqQiT0nB207xH"></div>
+        <div class="add-habit" data-page-node-id="bzEhyCSCXGESTEhwSyaB22">
+          <input id="habitInput" placeholder="新增习惯，如：喝水" data-page-node-id="CU9FNNxHivRBOHxIEfOjcj">
+          <button class="btn" onclick="addHabit()" data-page-node-id="ojFLsKxKcSDXJVZWfyvZ3C">添加</button>
         </div>
       </div>
     </section>
 
     <!-- 每周任务 -->
-    <section class="page" id="page-tasks">
-      <div class="card">
-        <h2>每周任务 <span class="hint">勾选即完成</span></h2>
-        <div class="task-add">
-          <input id="taskInput" placeholder="输入新任务，回车添加">
-          <button class="btn green" onclick="addTask()">添加</button>
+    <section class="page" id="page-tasks" data-page-node-id="J6D6PdAjEtWYMxYYOiFYxc">
+      <div class="card" data-page-node-id="GeSMDDdZ180QvdGepoREj4">
+        <h2 data-page-node-id="Tklo2xsa6Wnmu2haQbpNh7">每周任务 <span class="hint" data-page-node-id="4kr2VftkbNZ0x6J4fyWoOI">勾选即完成</span></h2>
+        <div class="task-add" data-page-node-id="vUyO4CvjzQVrnHFD4v4dl5">
+          <input id="taskInput" placeholder="输入新任务，回车添加" data-page-node-id="6aERc4KaLKCga7YlHfMHA0">
+          <button class="btn green" onclick="addTask()" data-page-node-id="gFaFzSfA00MGF53R5vEBi5">添加</button>
         </div>
-        <div id="taskList"></div>
+        <div id="taskList" data-page-node-id="4HsWCs4BwYqGKIPc9ZVBas"></div>
       </div>
     </section>
 
     <!-- 周计划手帐 -->
-    <section class="page" id="page-planner">
-      <div class="week-strip" id="weekStrip"></div>
-      <div class="diary-paper">
-        <div class="paper-spine"></div>
-        <div class="paper-inner" id="diaryPaper"></div>
+    <section class="page" id="page-planner" data-page-node-id="o7sCIz4DcHXTQEygtGfhW2">
+      <div class="week-strip" id="weekStrip" data-page-node-id="dHvBIoUrl6ZqsvD6scXAXI"></div>
+      <div class="diary-paper" data-page-node-id="HbcoFCg9nQaN2oYijdo2Ff">
+        <div class="paper-spine" data-page-node-id="cr5ruC79o2oasBwmOQAg5H"></div>
+        <div class="paper-inner" id="diaryPaper" data-page-node-id="MqpnFDfd33DOKUSXdJVBbV"></div>
       </div>
-      <div class="diary-nav">
-        <button id="diaryPrev" onclick="diaryPrev()">‹ 上一天</button>
-        <span class="month" id="diaryMonth"></span>
-        <button id="diaryNext" onclick="diaryNext()">下一天 ›</button>
+      <div class="diary-nav" data-page-node-id="AlNjcICmr24JGsbvFMiKlu">
+        <button id="diaryPrev" onclick="diaryPrev()" data-page-node-id="KXHDDw3fTBzewqLnHxHGYy">‹ 上一天</button>
+        <span class="month" id="diaryMonth" data-page-node-id="GAJnPhi5nGYKaNvRHEAtu6"></span>
+        <button id="diaryNext" onclick="diaryNext()" data-page-node-id="RKUMXGHbWyCgKAMcElmMI9">下一天 ›</button>
       </div>
-      <div class="card diary-add">
+      <div class="card diary-add" data-page-node-id="w0jyYXfZv5DBuxDbrAFJ7a">
         <textarea id="diaryText" placeholder="记录今天的一点小事…"></textarea>
-        <div class="row">
-          <input type="file" id="diaryImg" accept="image/*">
-          <button class="btn" onclick="addDiary()">保存日记</button>
+        <div class="row" data-page-node-id="fjQqSrtZNnBn9PiBGMzdPg">
+          <input type="file" id="diaryImg" accept="image/*" data-page-node-id="rRFQHW7HrE7fP9NM6Ci0MU">
+          <button class="btn" onclick="addDiary()" data-page-node-id="eXB9M8IsB6GbcjKZoGql21">保存日记</button>
         </div>
       </div>
     </section>
 
     <!-- 回收站 -->
-    <section class="page" id="page-trash">
-      <div class="card">
-        <h2>回收站 <span class="hint">误删可恢复</span></h2>
-        <div id="trashList"></div>
-        <button class="btn trash-clear" onclick="emptyTrash()">清空回收站</button>
+    <section class="page" id="page-trash" data-page-node-id="BlWDvFkTAQzX7wE2tHnP9Q">
+      <div class="card" data-page-node-id="CMSNBo4SO2QhImBSHMJ3ki">
+        <h2 data-page-node-id="XqmJwM3txH3sFEOdjedCzw">回收站 <span class="hint" data-page-node-id="RY2jU7paXA6p2ga0V3dNuk">误删可恢复</span></h2>
+        <div id="trashList" data-page-node-id="HrgTCMFG032vuoip9rb7WQ"></div>
+        <button class="btn trash-clear" onclick="emptyTrash()" data-page-node-id="GT50ZyaKbk4C1GhVsWkgPX">清空回收站</button>
       </div>
     </section>
   </main>
 
-  <nav class="tabbar">
-    <button class="tab active" data-tab="progress" onclick="switchTab('progress')"><span class="ico">📊</span>打卡进度</button>
-    <button class="tab" data-tab="weekcheck" onclick="switchTab('weekcheck')"><span class="ico">✅</span>周打卡</button>
-    <button class="tab" data-tab="tasks" onclick="switchTab('tasks')"><span class="ico">📝</span>每周任务</button>
-    <button class="tab" data-tab="planner" onclick="switchTab('planner')"><span class="ico">📖</span>周计划手帐</button>
-    <button class="tab" data-tab="trash" onclick="switchTab('trash')"><span class="ico">🗑</span>回收站</button>
+  <nav class="tabbar" data-page-node-id="o6TDwP9snK3UWmuUSSCcDf">
+    <button class="tab active" data-tab="progress" onclick="switchTab('progress')" data-page-node-id="Us20TSshgYDSEcjGvUMumv"><span class="ico" data-page-node-id="0a1OHAkUJkAhjZjzNtFOqn">📊</span>打卡进度</button>
+    <button class="tab" data-tab="weekcheck" onclick="switchTab('weekcheck')" data-page-node-id="cIDZfzmfm73ZELAvMGxhtY"><span class="ico" data-page-node-id="hvlBHPXSAWOYT62eUFio0G">✅</span>周打卡</button>
+    <button class="tab" data-tab="tasks" onclick="switchTab('tasks')" data-page-node-id="pTTdiXTfLPGprZcYl55LfH"><span class="ico" data-page-node-id="oQ89UmeKOntVCp3lCG452h">📝</span>每周任务</button>
+    <button class="tab" data-tab="planner" onclick="switchTab('planner')" data-page-node-id="C94aCycX2vTtCux323yQcg"><span class="ico" data-page-node-id="fFlmkyDMX0M2BW5Fhkqn5n">📖</span>周计划手帐</button>
+    <button class="tab" data-tab="trash" onclick="switchTab('trash')" data-page-node-id="caG8EVU6fW47bgC06p9syV"><span class="ico" data-page-node-id="O9UwWKlL3MBwwLKaJTHRSE">🗑</span>回收站</button>
   </nav>
 </div>
 
@@ -346,6 +348,7 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
   if(name==='planner')renderPlanner();
   if(name==='trash')renderTrash();
+  if(name==='progress')updateStats();
 }
 
 /* ---------- 周打卡 ---------- */
