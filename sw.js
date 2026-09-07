@@ -1,4 +1,4 @@
-const CACHE = 'pperson-v7';
+const CACHE = 'pperson-v8';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', e => {
