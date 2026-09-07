@@ -217,10 +217,11 @@
   .diary-nav button{border:none;background:var(--pink);color:#a23b46;border-radius:12px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--cartoon);box-shadow:0 4px 12px rgba(242,103,116,.25);transition:opacity .2s,transform .15s;}
   .diary-nav button:active{opacity:.7;transform:scale(.96);}
   .diary-nav button:disabled{opacity:.4;box-shadow:none;}
-  /* 保存日记：横向布局（文字 + 选取图片 + 保存 并排） */
+  /* 保存日记：文字输入在上，图片/保存在右下角 */
   .diary-add{padding:14px;}
-  .da-row{display:flex;gap:8px;align-items:flex-end;}
-  .da-text{flex:1;min-width:0;min-height:64px;resize:vertical;line-height:1.55;border:1.5px solid rgba(255,255,255,.9);border-radius:12px;padding:10px 12px;font-size:14px;font-family:var(--cartoon);background:var(--glass-strong);color:#5a4a4a;}
+  .da-top{margin-bottom:12px;}
+  .da-bottom{display:flex;justify-content:flex-end;align-items:center;gap:14px;}
+  .da-text{width:100%;min-height:80px;resize:vertical;line-height:1.55;border:1.5px solid rgba(255,255,255,.9);border-radius:12px;padding:10px 12px;font-size:14px;font-family:var(--cartoon);background:var(--glass-strong);color:#5a4a4a;}
   .da-text::placeholder{color:var(--done);}
   .da-file-btn{
     flex:0 0 auto;border:1.5px dashed var(--pink-mid);border-radius:12px;padding:10px 12px;
@@ -389,8 +390,10 @@
         <button id="diaryNext" onclick="diaryNext()" data-page-node-id="RKUMXGHbWyCgKAMcElmMI9">下一天 ›</button>
       </div>
       <div class="card diary-add" data-page-node-id="w0jyYXfZv5DBuxDbrAFJ7a">
-        <div class="da-row">
+        <div class="da-top">
           <textarea id="diaryText" class="da-text" placeholder="记录今天的一点小事…" data-page-node-id="drW9K8ZkPvXL1qy0LbA0nC"></textarea>
+        </div>
+        <div class="da-bottom">
           <label class="da-file-btn" data-page-node-id="rRFQHW7HrE7fP9NM6Ci0MU">📎 图片
             <input type="file" id="diaryImg" accept="image/*" multiple hidden>
           </label>
