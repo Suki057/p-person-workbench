@@ -1,8 +1,13 @@
-const CACHE = 'pperson-v14';
+const CACHE = 'pperson-v15';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // 逐个预缓存：单点失败不阻断安装，保证 skipWaiting 一定执行（否则 SW 卡在 waiting 不激活）
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    await Promise.allSettled(ASSETS.map(u => c.add(u)));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', e => {
