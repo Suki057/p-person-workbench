@@ -239,8 +239,26 @@
   @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.96);}to{opacity:1;transform:none;}}
   .modal-back{border:none;background:var(--pink);color:#a23b46;border-radius:14px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--cartoon);box-shadow:0 4px 12px rgba(242,103,116,.25);margin-bottom:14px;transition:transform .15s,opacity .2s;}
   .modal-back:active{transform:scale(.96);opacity:.8;}
-  .modal-imgs{display:flex;flex-direction:column;gap:14px;margin-bottom:18px;}
-  .modal-imgs img{width:100%;border-radius:16px;display:block;box-shadow:0 6px 16px rgba(0,0,0,.14);}
+  .modal-imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+  .modal-imgs img{width:100%;height:90px;object-fit:cover;border-radius:12px;display:block;box-shadow:0 4px 10px rgba(0,0,0,.12);cursor:pointer;transition:transform .15s;}
+  .modal-imgs img:active{transform:scale(.96);}
+  .modal-imgs .modal-empty{grid-column:1/-1;}
+  /* 图片放大查看 */
+  .img-lightbox{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,12,16,.85);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:20px;}
+  .img-lightbox[hidden]{display:none;}
+  .img-lightbox img{max-width:100%;max-height:90vh;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.5);}
+  .img-lightbox .lb-close{position:absolute;top:18px;right:18px;border:none;background:rgba(255,255,255,.92);color:#5a4a4a;border-radius:50%;width:40px;height:40px;font-size:22px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+  /* 删除确认弹窗 */
+  .confirm-mask{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;background:rgba(45,30,35,.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:24px;}
+  .confirm-mask[hidden]{display:none;}
+  .confirm-card{width:100%;max-width:300px;background:var(--glass-strong);border:1px solid rgba(255,255,255,.85);border-radius:22px;padding:22px 20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);animation:pop .22s ease;}
+  .confirm-card .ctitle{font-family:var(--cartoon);font-size:16px;color:#5a4a4a;margin-bottom:6px;font-weight:600;}
+  .confirm-card .cmsg{font-size:13px;color:var(--done);margin-bottom:18px;}
+  .confirm-btns{display:flex;gap:10px;}
+  .confirm-btns button{flex:1;border:none;border-radius:14px;padding:11px 0;font-size:14px;cursor:pointer;font-family:var(--cartoon);transition:transform .15s,opacity .2s;}
+  .confirm-btns .c-cancel{background:rgba(255,255,255,.7);color:#7a6a6a;}
+  .confirm-btns .c-ok{background:var(--pink-mid);color:#fff;box-shadow:0 4px 12px rgba(242,103,116,.3);}
+  .confirm-btns button:active{transform:scale(.96);}
   .modal-text{font-size:15px;line-height:1.75;color:#5a4a4a;font-family:var(--cartoon);white-space:pre-wrap;word-break:break-word;}
   .modal-empty{color:var(--done);font-size:13px;text-align:center;padding:30px 0;}
 
@@ -391,6 +409,24 @@
     </div>
   </div>
 
+  <!-- 图片放大查看 -->
+  <div class="img-lightbox" id="imgLightbox" hidden>
+    <button class="lb-close" onclick="closeImageLightbox()">×</button>
+    <img id="imgLightboxSrc" src="" alt="查看大图">
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div class="confirm-mask" id="confirmDialog" hidden>
+    <div class="confirm-card">
+      <div class="ctitle">删除确认</div>
+      <div class="cmsg" id="confirmMsg">确定要删除吗？</div>
+      <div class="confirm-btns">
+        <button class="c-cancel" onclick="cancelConfirmDelete()">取消</button>
+        <button class="c-ok" onclick="doConfirmDelete()">确定</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="tabbar" data-page-node-id="o6TDwP9snK3UWmuUSSCcDf">
     <button class="tab active" data-tab="progress" onclick="switchTab('progress')" data-page-node-id="Us20TSshgYDSEcjGvUMumv"><span class="ico" data-page-node-id="0a1OHAkUJkAhjZjzNtFOqn">📊</span>打卡进度</button>
     <button class="tab" data-tab="weekcheck" onclick="switchTab('weekcheck')" data-page-node-id="cIDZfzmfm73ZELAvMGxhtY"><span class="ico" data-page-node-id="hvlBHPXSAWOYT62eUFio0G">✅</span>周打卡</button>
@@ -510,7 +546,7 @@ function renderTasks(){
       const txt=document.createElement('div');txt.className='task-text'+(t.done?' done':'');
       txt.textContent=t.text;
       const del=document.createElement('button');del.className='task-del';del.textContent='×';
-      del.onclick=()=>delTask(t.id);
+      del.onclick=(e)=>confirmDelete(e,'task',t.id);
       item.append(chk,txt,del);g.appendChild(item);
     });
     wrap.appendChild(g);
@@ -639,7 +675,7 @@ function renderDiaryPaper(){
   }else{
     tasks.forEach(t=>{
       html+=`<div class="pr-event ${t.done?'done':''}" onclick="toggleTask(${t.id})">
-        <button class="ev-del" onclick="event.stopPropagation();delTaskFromPlanner(${t.id})" title="删除">×</button>
+        <button class="ev-del" onclick="confirmDelete(event,'task',${t.id})" title="删除">×</button>
         <div class="ev-text ${t.done?'done':''}">${escapeHtml(t.text)}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 每天一件自律小事</div>
       </div>`;
@@ -647,7 +683,7 @@ function renderDiaryPaper(){
     diaries.forEach(d=>{
       const imgs=diaryImages(d);
       html+=`<div class="pr-event diary" onclick="openDiary(${d.id})">
-        <button class="ev-del" onclick="event.stopPropagation();delDiary(${d.id})" title="删除">×</button>
+        <button class="ev-del" onclick="confirmDelete(event,'diary',${d.id})" title="删除">×</button>
         ${imgs.map(s=>`<img class="pr-diary-img" src="${s}">`).join('')}
         <div class="ev-text">${escapeHtml(d.text||'')}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 手帐日记</div>
@@ -742,16 +778,51 @@ function clearDiaryFile(){selectedDiaryFiles=[];const file=document.getElementBy
 document.getElementById('diaryImg').addEventListener('change',showDiaryFileChip);
 // 日记查看弹窗
 function diaryImages(d){return d.images&&d.images.length?d.images:(d.image?[d.image]:[]);}
+let currentModalImgs=[];
 function openDiary(id){
   const d=state.diaries.find(x=>x.id===id);if(!d)return;
   const imgs=diaryImages(d);
-  document.getElementById('modalImgs').innerHTML=imgs.length?imgs.map(s=>`<img src="${s}">`).join(''):'<div class="modal-empty">（无图片）</div>';
+  currentModalImgs=imgs;
+  document.getElementById('modalImgs').innerHTML=imgs.length
+    ? imgs.map((s,i)=>`<img src="${s}" onclick="openImageLightbox(${i})" alt="日记图片 ${i+1}">`).join('')
+    : '<div class="modal-empty">（无图片）</div>';
   document.getElementById('modalText').textContent=d.text||'（无文字）';
   document.getElementById('diaryModal').hidden=false;
 }
 function closeDiary(){document.getElementById('diaryModal').hidden=true;}
 // 点击遮罩空白处关闭
 document.getElementById('diaryModal').addEventListener('click',e=>{if(e.target.id==='diaryModal')closeDiary();});
+// 图片放大查看（点击缩略图）
+function openImageLightbox(idx){
+  const src=currentModalImgs[idx];if(!src)return;
+  document.getElementById('imgLightboxSrc').src=src;
+  document.getElementById('imgLightbox').hidden=false;
+}
+function closeImageLightbox(){document.getElementById('imgLightbox').hidden=true;}
+// 点击放大层空白处关闭
+document.getElementById('imgLightbox').addEventListener('click',e=>{if(e.target.id==='imgLightbox')closeImageLightbox();});
+// 删除确认（确定/取消）
+let pendingDelete=null;
+function confirmDelete(ev, type, id){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  pendingDelete={type,id};
+  document.getElementById('confirmMsg').textContent = type==='diary'?'确定要删除这篇日记吗？':'确定要删除这条记录吗？';
+  document.getElementById('confirmDialog').hidden=false;
+}
+function doConfirmDelete(){
+  if(!pendingDelete)return;
+  const {type,id}=pendingDelete;
+  pendingDelete=null;
+  document.getElementById('confirmDialog').hidden=true;
+  if(type==='diary')delDiary(id);
+  else delTaskFromPlanner(id);
+}
+function cancelConfirmDelete(){
+  pendingDelete=null;
+  document.getElementById('confirmDialog').hidden=true;
+}
+// 点击确认框空白处 = 取消
+document.getElementById('confirmDialog').addEventListener('click',e=>{if(e.target.id==='confirmDialog')cancelConfirmDelete();});
 // 触摸滑动翻页
 (function(){
   const stage=document.getElementById('diaryPaper');
