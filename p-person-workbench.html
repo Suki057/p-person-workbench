@@ -111,19 +111,20 @@
   /* ---------- 周打卡 tab ---------- */
   .week-head{display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;margin-bottom:10px;}
   .week-head div{text-align:center;font-size:12px;color:var(--done);}
-  .habit-row{position:relative;display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:12px;}
+  .habit-row{position:relative;display:grid;grid-template-columns:92px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:12px;}
+  .habit-name{font-size:13px;display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0;}
+  .habit-name .nm-block{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+  .habit-name .nm{font-weight:600;color:#5a4a4a;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .habit-name .streak{font-size:10px;color:var(--done);}
   .habit-del{
-    position:absolute;right:-4px;top:50%;transform:translateY(-50%);
-    border:none;background:rgba(255,255,255,0.8);color:#a23b46;border-radius:50%;
-    width:22px;height:22px;font-size:14px;line-height:1;cursor:pointer;
+    flex:0 0 auto;margin-left:2px;
+    border:none;background:rgba(255,255,255,0.85);color:#a23b46;border-radius:50%;
+    width:22px;height:22px;font-size:15px;line-height:1;cursor:pointer;
     display:flex;align-items:center;justify-content:center;z-index:3;
     box-shadow:0 2px 6px rgba(150,90,100,.2);transition:background .2s,transform .15s,opacity .2s;opacity:0;
   }
-  .habit-row:hover .habit-del,.habit-row:active .habit-del{opacity:1;}
-  .habit-del:active{background:var(--pink-mid);color:#fff;transform:translateY(-50%) scale(.9);}
-  .habit-name{font-size:13px;display:flex;flex-direction:column;gap:2px;}
-  .habit-name .nm{font-weight:600;color:#5a4a4a;}
-  .habit-name .streak{font-size:10px;color:var(--done);}
+  .habit-row:hover .habit-del,.habit-row.show-del .habit-del{opacity:1;}
+  .habit-del:active{background:var(--pink-mid);color:#fff;transform:scale(.9);}
   .dot{
     width:32px;height:32px;border-radius:50%;margin:0 auto;cursor:pointer;
     background:var(--glass-strong);border:1.5px solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;
@@ -211,24 +212,37 @@
   .diary-nav button:disabled{opacity:.4;box-shadow:none;}
   /* 保存日记：横向布局（文字 + 选取图片 + 保存 并排） */
   .diary-add{padding:14px;}
-  .da-row{display:flex;gap:8px;align-items:center;}
-  .da-text{flex:1;min-width:0;border:1.5px solid rgba(255,255,255,.9);border-radius:12px;padding:9px 12px;font-size:14px;font-family:var(--cartoon);background:var(--glass-strong);color:#5a4a4a;}
+  .da-row{display:flex;gap:8px;align-items:flex-end;}
+  .da-text{flex:1;min-width:0;min-height:64px;resize:vertical;line-height:1.55;border:1.5px solid rgba(255,255,255,.9);border-radius:12px;padding:10px 12px;font-size:14px;font-family:var(--cartoon);background:var(--glass-strong);color:#5a4a4a;}
   .da-text::placeholder{color:var(--done);}
   .da-file-btn{
-    flex:0 0 auto;border:1.5px dashed var(--pink-mid);border-radius:12px;padding:9px 12px;
+    flex:0 0 auto;border:1.5px dashed var(--pink-mid);border-radius:12px;padding:10px 12px;
     font-size:13px;color:#a23b46;background:rgba(255,217,222,.35);cursor:pointer;
     display:flex;align-items:center;gap:4px;font-family:var(--cartoon);white-space:nowrap;transition:background .2s,transform .15s;
   }
   .da-file-btn:active{transform:scale(.96);background:rgba(255,217,222,.6);}
   .diary-add .btn{margin:0;flex:0 0 auto;}
+  .da-files{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+  .da-files:empty{display:none;}
   .da-file-chip{
-    display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;
+    display:flex;align-items:center;gap:8px;padding:8px 12px;
     background:rgba(255,217,222,.3);border:1px solid rgba(242,103,116,.25);border-radius:12px;
     font-size:12px;color:#a23b46;
   }
   .da-file-chip .fn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .da-file-x{border:none;background:var(--pink-mid);color:#fff;border-radius:50%;width:20px;height:20px;font-size:13px;line-height:1;cursor:pointer;flex:0 0 auto;transition:transform .15s;}
   .da-file-x:active{transform:scale(.85);}
+  /* 日记查看弹窗 */
+  .modal-mask{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(45,30,35,.45);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);}
+  .modal-mask[hidden]{display:none;}
+  .modal-card{width:100%;max-width:440px;max-height:84vh;overflow-y:auto;background:var(--glass-strong);border:1px solid rgba(255,255,255,.85);border-radius:24px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.32);animation:pop .25s ease;}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.96);}to{opacity:1;transform:none;}}
+  .modal-back{border:none;background:var(--pink);color:#a23b46;border-radius:14px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--cartoon);box-shadow:0 4px 12px rgba(242,103,116,.25);margin-bottom:14px;transition:transform .15s,opacity .2s;}
+  .modal-back:active{transform:scale(.96);opacity:.8;}
+  .modal-imgs{display:flex;flex-direction:column;gap:14px;margin-bottom:18px;}
+  .modal-imgs img{width:100%;border-radius:16px;display:block;box-shadow:0 6px 16px rgba(0,0,0,.14);}
+  .modal-text{font-size:15px;line-height:1.75;color:#5a4a4a;font-family:var(--cartoon);white-space:pre-wrap;word-break:break-word;}
+  .modal-empty{color:var(--done);font-size:13px;text-align:center;padding:30px 0;}
 
   /* 手帐事件删除按钮 */
   .ev-del{
@@ -348,16 +362,13 @@
       </div>
       <div class="card diary-add" data-page-node-id="w0jyYXfZv5DBuxDbrAFJ7a">
         <div class="da-row">
-          <input type="text" id="diaryText" class="da-text" placeholder="记录今天的一点小事…" data-page-node-id="drW9K8ZkPvXL1qy0LbA0nC">
+          <textarea id="diaryText" class="da-text" placeholder="记录今天的一点小事…" data-page-node-id="drW9K8ZkPvXL1qy0LbA0nC"></textarea>
           <label class="da-file-btn" data-page-node-id="rRFQHW7HrE7fP9NM6Ci0MU">📎 图片
-            <input type="file" id="diaryImg" accept="image/*" hidden>
+            <input type="file" id="diaryImg" accept="image/*" multiple hidden>
           </label>
           <button class="btn" onclick="addDiary()" data-page-node-id="eXB9M8IsB6GbcjKZoGql21">保存</button>
         </div>
-        <div class="da-file-chip" id="diaryFileChip" hidden data-page-node-id="F1cVy2pWq2Xn4mR8sT0aBc">
-          <span class="fn" id="diaryFileName" data-page-node-id="gH3kL9mN2pQ4rS6tU8vWxY"></span>
-          <button type="button" class="da-file-x" onclick="clearDiaryFile()" data-page-node-id="xY7zA1bC3dE5fG7hI9jK">×</button>
-        </div>
+        <div class="da-files" id="diaryFileChips" data-page-node-id="F1cVy2pWq2Xn4mR8sT0aBc"></div>
       </div>
     </section>
 
@@ -370,6 +381,15 @@
       </div>
     </section>
   </main>
+
+  <!-- 日记查看弹窗 -->
+  <div class="modal-mask" id="diaryModal" hidden>
+    <div class="modal-card">
+      <button class="modal-back" onclick="closeDiary()">‹ 返回</button>
+      <div class="modal-imgs" id="modalImgs"></div>
+      <div class="modal-text" id="modalText"></div>
+    </div>
+  </div>
 
   <nav class="tabbar" data-page-node-id="o6TDwP9snK3UWmuUSSCcDf">
     <button class="tab active" data-tab="progress" onclick="switchTab('progress')" data-page-node-id="Us20TSshgYDSEcjGvUMumv"><span class="ico" data-page-node-id="0a1OHAkUJkAhjZjzNtFOqn">📊</span>打卡进度</button>
@@ -443,7 +463,11 @@ function renderHabits(){
     const p=PALETTE[h.color%3];
     const row=document.createElement('div');row.className='habit-row';
     const name=document.createElement('div');name.className='habit-name';
-    name.innerHTML=`<span class="nm">${h.name}</span><span class="streak">连续${maxStreak(h.days)}天</span>`;
+    name.innerHTML=`<div class="nm-block"><span class="nm">${escapeHtml(h.name)}</span><span class="streak">连续${maxStreak(h.days)}天</span></div>`;
+    const del=document.createElement('button');del.className='habit-del';del.textContent='×';
+    del.title='删除该习惯（可到回收站恢复）';
+    del.onclick=(e)=>{e.stopPropagation();delHabit(h.id);};
+    name.appendChild(del);
     row.appendChild(name);
     h.days.forEach((done,i)=>{
       const dot=document.createElement('div');
@@ -452,10 +476,10 @@ function renderHabits(){
       dot.onclick=()=>{h.days[i]=!h.days[i];save();renderHabits();updateStats();};
       row.appendChild(dot);
     });
-    const del=document.createElement('button');del.className='habit-del';del.textContent='×';
-    del.title='删除该习惯（可到回收站恢复）';
-    del.onclick=()=>delHabit(h.id);
-    row.appendChild(del);
+    // 长按 450ms 显示删除按钮（移动端），松开即隐藏
+    let lp=null;
+    row.addEventListener('touchstart',()=>{lp=setTimeout(()=>row.classList.add('show-del'),450);},{passive:true});
+    ['touchend','touchmove','touchcancel'].forEach(ev=>row.addEventListener(ev,()=>{if(lp){clearTimeout(lp);lp=null;}},{passive:true}));
     wrap.appendChild(row);
   });
 }
@@ -621,9 +645,10 @@ function renderDiaryPaper(){
       </div>`;
     });
     diaries.forEach(d=>{
-      html+=`<div class="pr-event diary">
+      const imgs=diaryImages(d);
+      html+=`<div class="pr-event diary" onclick="openDiary(${d.id})">
         <button class="ev-del" onclick="event.stopPropagation();delDiary(${d.id})" title="删除">×</button>
-        ${d.image?`<img class="pr-diary-img" src="${d.image}">`:''}
+        ${imgs.map(s=>`<img class="pr-diary-img" src="${s}">`).join('')}
         <div class="ev-text">${escapeHtml(d.text||'')}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 手帐日记</div>
       </div>`;
@@ -677,39 +702,56 @@ function toggleTask(id){
   if(t){t.done=!t.done;save();renderPlanner();renderTasks();updateStats();}
 }
 function focusDiary(){document.getElementById('diaryText').focus();}
+let selectedDiaryFiles=[];
 function addDiary(){
   const tx=document.getElementById('diaryText');
-  const file=document.getElementById('diaryImg');
   const text=tx.value.trim();
-  if(!text&&!file.files.length){return;}
-  const entry={id:Date.now(),date:selectedDate,text};
+  if(!text && selectedDiaryFiles.length===0) return;
+  const entry={id:Date.now(),date:selectedDate,text,images:[]};
+  const files=selectedDiaryFiles.slice();
   const done=()=>{
-    state.diaries.push(entry);save();tx.value='';file.value='';hideDiaryFileChip();
+    state.diaries.unshift(entry);save();   // 新日记置顶显示
+    tx.value='';clearDiaryFile();          // 输入与图片恢复默认状态
     renderPlanner();renderTasks();updateStats();
   };
-  if(file.files.length){
-    const reader=new FileReader();
-    reader.onload=()=>{entry.image=reader.result;done();};
-    reader.readAsDataURL(file.files[0]);
+  if(files.length){
+    let loaded=0;
+    files.forEach(f=>{
+      const reader=new FileReader();
+      reader.onload=()=>{entry.images.push(reader.result);loaded++;if(loaded===files.length)done();};
+      reader.readAsDataURL(f);
+    });
   }else done();
 }
-// 选取图片后显示可删除的 chip
+// 选取图片后显示可删除的 chip（支持多张）
 function showDiaryFileChip(){
   const file=document.getElementById('diaryImg');
-  const chip=document.getElementById('diaryFileChip');
-  const fn=document.getElementById('diaryFileName');
-  if(file.files.length){fn.textContent=file.files[0].name;chip.hidden=false;}
-  else hideDiaryFileChip();
+  if(file.files&&file.files.length){
+    for(let i=0;i<file.files.length;i++) selectedDiaryFiles.push(file.files[i]);
+  }
+  file.value='';
+  renderDiaryFileChips();
 }
-function hideDiaryFileChip(){
-  const chip=document.getElementById('diaryFileChip');
-  const file=document.getElementById('diaryImg');
-  if(chip)chip.hidden=true;
-  if(file)file.value='';
+function renderDiaryFileChips(){
+  const box=document.getElementById('diaryFileChips');
+  box.innerHTML=selectedDiaryFiles.map((f,i)=>`<div class="da-file-chip"><span class="fn">${escapeHtml(f.name)}</span><button type="button" class="da-file-x" onclick="removeDiaryFile(${i})">×</button></div>`).join('');
 }
-function clearDiaryFile(){hideDiaryFileChip();}
+function removeDiaryFile(idx){selectedDiaryFiles.splice(idx,1);renderDiaryFileChips();}
+function clearDiaryFile(){selectedDiaryFiles=[];const file=document.getElementById('diaryImg');if(file)file.value='';renderDiaryFileChips();}
 // 绑定文件选择事件
 document.getElementById('diaryImg').addEventListener('change',showDiaryFileChip);
+// 日记查看弹窗
+function diaryImages(d){return d.images&&d.images.length?d.images:(d.image?[d.image]:[]);}
+function openDiary(id){
+  const d=state.diaries.find(x=>x.id===id);if(!d)return;
+  const imgs=diaryImages(d);
+  document.getElementById('modalImgs').innerHTML=imgs.length?imgs.map(s=>`<img src="${s}">`).join(''):'<div class="modal-empty">（无图片）</div>';
+  document.getElementById('modalText').textContent=d.text||'（无文字）';
+  document.getElementById('diaryModal').hidden=false;
+}
+function closeDiary(){document.getElementById('diaryModal').hidden=true;}
+// 点击遮罩空白处关闭
+document.getElementById('diaryModal').addEventListener('click',e=>{if(e.target.id==='diaryModal')closeDiary();});
 // 触摸滑动翻页
 (function(){
   const stage=document.getElementById('diaryPaper');
