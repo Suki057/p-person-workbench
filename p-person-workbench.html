@@ -4,6 +4,13 @@
 <meta charset="UTF-8" data-page-node-id="xUrc9vl924408JvlCjRIVH">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="YkVHUvhAO03RxGZ66WBECv">
 <title>P人爆改J人 · 自律打卡工作台</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="自律打卡">
+<meta name="theme-color" content="#E6B8C4">
 <style>
   :root{
     --bg:#FAF8F5;
@@ -132,6 +139,7 @@
   .planner-right{
     border-radius:0 8px 8px 0;margin-right:8px;
     transform:rotateY(-2deg);transform-origin:left center;
+    backface-visibility:hidden;
     box-shadow:inset 8px 0 18px rgba(0,0,0,0.04), -2px 0 6px rgba(0,0,0,0.04);
   }
 
@@ -476,7 +484,28 @@ function renderPlanner(){
   monthLabel.textContent=selectedDate.slice(0,7)+' · '+dayName(selectedDate);
   updateDiaryNav();
 }
-function selectDate(date){selectedDate=date;renderPlanner();}
+let plannerFlipLock=false;
+function flipTo(date, dir){
+  if(plannerFlipLock||date===selectedDate)return;
+  const right=document.getElementById('plannerRight');
+  plannerFlipLock=true;
+  right.style.transition='transform .32s ease-in';
+  right.style.transform='rotateY('+(dir>0?-150:150)+'deg)'; // 当前页绕书脊翻折离开
+  setTimeout(()=>{
+    selectedDate=date;renderPlanner(); // 换内容
+    right.style.transition='none';
+    right.style.transform='rotateY('+(dir>0?150:-150)+'deg)'; // 从另一侧预备进入
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      right.style.transition='transform .32s ease-out';
+      right.style.transform='rotateY(-2deg)'; // 转回微张原位
+    }));
+    setTimeout(()=>{plannerFlipLock=false;},340);
+  },320);
+}
+function selectDate(date){
+  const dir=date>selectedDate?1:(date<selectedDate?-1:0);
+  flipTo(date,dir);
+}
 function updateDiaryNav(){
   const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
   document.getElementById('diaryPrev').disabled=idx<=0;
@@ -484,11 +513,11 @@ function updateDiaryNav(){
 }
 function diaryPrev(){
   const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
-  if(idx>0){selectedDate=week[idx-1];renderPlanner();}
+  if(idx>0){flipTo(week[idx-1],-1);}
 }
 function diaryNext(){
   const week=getWeekDates(selectedDate);const idx=week.indexOf(selectedDate);
-  if(idx<week.length-1){selectedDate=week[idx+1];renderPlanner();}
+  if(idx<week.length-1){flipTo(week[idx+1],1);}
 }
 function toggleTask(id){
   const t=state.tasks.find(x=>x.id===id);
@@ -551,6 +580,13 @@ renderHabits();
 renderTasks();
 renderPlanner();
 updateStats();
+
+/* 注册 Service Worker（支持离线 / 添加到手机屏幕） */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
