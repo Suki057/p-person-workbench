@@ -161,6 +161,27 @@
   .diary-add .row{display:flex;gap:8px;align-items:center;}
   .diary-add input[type=file]{font-size:12px;flex:1;}
 
+  /* 手帐事件删除按钮 */
+  .ev-del{
+    position:absolute;top:6px;right:8px;border:none;background:rgba(255,255,255,0.65);
+    color:#7a5a63;border-radius:50%;width:22px;height:22px;font-size:14px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;
+  }
+  .ev-del:active{background:rgba(0,0,0,0.12);}
+
+  /* 回收站 */
+  .trash-item{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed #f0ede9;}
+  .trash-info{flex:1;min-width:0;}
+  .trash-type{font-size:12px;color:var(--done);}
+  .trash-text{font-size:14px;color:#5a5347;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .trash-date{font-size:11px;color:var(--done);margin-top:2px;}
+  .trash-actions{display:flex;flex-direction:column;gap:6px;flex:0 0 auto;}
+  .trash-actions button{border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;transition:opacity .2s;}
+  .trash-actions button:active{opacity:.7;}
+  .trash-actions .restore{background:var(--green);color:#4f6f5a;}
+  .trash-actions .purge{background:#fff;color:#c08a8a;border:1px solid #f0dada;}
+  .trash-clear{width:100%;margin-top:12px;background:var(--yellow);color:#8a7a5a;}
+
   /* ---------- 底部 tab bar ---------- */
   .tabbar{
     position:fixed;bottom:0;left:50%;transform:translateX(-50%);
@@ -257,6 +278,15 @@
         </div>
       </div>
     </section>
+
+    <!-- 回收站 -->
+    <section class="page" id="page-trash">
+      <div class="card">
+        <h2>回收站 <span class="hint">误删可恢复</span></h2>
+        <div id="trashList"></div>
+        <button class="btn trash-clear" onclick="emptyTrash()">清空回收站</button>
+      </div>
+    </section>
   </main>
 
   <nav class="tabbar">
@@ -264,6 +294,7 @@
     <button class="tab" data-tab="weekcheck" onclick="switchTab('weekcheck')"><span class="ico">✅</span>周打卡</button>
     <button class="tab" data-tab="tasks" onclick="switchTab('tasks')"><span class="ico">📝</span>每周任务</button>
     <button class="tab" data-tab="planner" onclick="switchTab('planner')"><span class="ico">📖</span>周计划手帐</button>
+    <button class="tab" data-tab="trash" onclick="switchTab('trash')"><span class="ico">🗑</span>回收站</button>
   </nav>
 </div>
 
@@ -285,7 +316,12 @@ function thisMonth(){return monthStr(todayStr());}
 function loadState(){
   try{
     const s=JSON.parse(localStorage.getItem(STORE_KEY));
-    if(s&&s.habits) return s;
+    if(s&&s.habits){
+      if(!Array.isArray(s.trash))s.trash=[];
+      if(!Array.isArray(s.tasks))s.tasks=[];
+      if(!Array.isArray(s.diaries))s.diaries=[];
+      return s;
+    }
   }catch(e){}
   return {
     habits:[
@@ -296,7 +332,8 @@ function loadState(){
       {id:5,name:'冥想',color:1,days:[false,false,false,false,false,false,false]}
     ],
     tasks:[],
-    diaries:[]
+    diaries:[],
+    trash:[]
   };
 }
 function save(){localStorage.setItem(STORE_KEY,JSON.stringify(state));}
@@ -308,6 +345,7 @@ function switchTab(name){
   if(page)page.classList.add('active');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
   if(name==='planner')renderPlanner();
+  if(name==='trash')renderTrash();
 }
 
 /* ---------- 周打卡 ---------- */
@@ -360,7 +398,7 @@ function renderTasks(){
       const txt=document.createElement('div');txt.className='task-text'+(t.done?' done':'');
       txt.textContent=t.text;
       const del=document.createElement('button');del.className='task-del';del.textContent='×';
-      del.onclick=()=>{state.tasks=state.tasks.filter(x=>x.id!==t.id);save();renderTasks();updateStats();};
+      del.onclick=()=>delTask(t.id);
       item.append(chk,txt,del);g.appendChild(item);
     });
     wrap.appendChild(g);
@@ -373,6 +411,69 @@ function addTask(){
   inp.value='';save();renderTasks();updateStats();
 }
 document.getElementById('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+
+/* ---------- 删除 / 回收站 ---------- */
+function moveToTrash(type, item){
+  if(type==='diary'){
+    state.diaries=state.diaries.filter(d=>d.id!==item.id);
+  }else if(type==='task'){
+    state.tasks=state.tasks.filter(t=>t.id!==item.id);
+  }
+  state.trash.unshift({
+    trashId:Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    type, item,
+    deletedAt:new Date().toLocaleString('zh-CN',{hour12:false})
+  });
+  save();
+  renderPlanner();renderTasks();updateStats();
+  if(document.getElementById('page-trash').classList.contains('active'))renderTrash();
+}
+function delDiary(id){const d=state.diaries.find(x=>x.id===id);if(d)moveToTrash('diary',d);}
+function delTaskFromPlanner(id){const t=state.tasks.find(x=>x.id===id);if(t)moveToTrash('task',t);}
+function delTask(id){const t=state.tasks.find(x=>x.id===id);if(t)moveToTrash('task',t);}
+
+function renderTrash(){
+  const wrap=document.getElementById('trashList');if(!wrap)return;
+  if(!state.trash.length){
+    wrap.innerHTML='<div class="pr-empty">回收站是空的<br>误删的内容会暂时放在这里 🗑</div>';
+    return;
+  }
+  wrap.innerHTML=state.trash.map(e=>{
+    const isDiary=e.type==='diary';
+    const label=isDiary?'📖 手帐日记':'📝 任务';
+    const text=isDiary?(e.item.text||'(无文字)'):e.item.text;
+    const date=e.item.date||'';
+    return `<div class="trash-item">
+      <div class="trash-info">
+        <div class="trash-type">${label} · ${date}</div>
+        <div class="trash-text">${escapeHtml(text)}</div>
+        <div class="trash-date">${e.deletedAt} 删除</div>
+      </div>
+      <div class="trash-actions">
+        <button class="restore" onclick="restoreFromTrash('${e.trashId}')">恢复</button>
+        <button class="purge" onclick="purgeTrash('${e.trashId}')">永久删除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function restoreFromTrash(trashId){
+  const idx=state.trash.findIndex(e=>e.trashId===trashId);
+  if(idx<0)return;
+  const e=state.trash[idx];
+  if(e.type==='diary')state.diaries.push(e.item);
+  else state.tasks.push(e.item);
+  state.trash.splice(idx,1);
+  save();renderTrash();renderPlanner();renderTasks();updateStats();
+}
+function purgeTrash(trashId){
+  state.trash=state.trash.filter(e=>e.trashId!==trashId);
+  save();renderTrash();
+}
+function emptyTrash(){
+  if(!state.trash.length)return;
+  if(!confirm('确定清空回收站？所有内容将永久删除，不可恢复。'))return;
+  state.trash=[];save();renderTrash();
+}
 
 /* ---------- 周计划手帐（日期在上 + 日记在下） ---------- */
 let selectedDate=todayStr();
@@ -421,12 +522,14 @@ function renderDiaryPaper(){
   }else{
     tasks.forEach(t=>{
       html+=`<div class="pr-event ${t.done?'done':''}" onclick="toggleTask(${t.id})">
+        <button class="ev-del" onclick="event.stopPropagation();delTaskFromPlanner(${t.id})" title="删除">×</button>
         <div class="ev-text ${t.done?'done':''}">${escapeHtml(t.text)}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 每天一件自律小事</div>
       </div>`;
     });
     diaries.forEach(d=>{
       html+=`<div class="pr-event diary">
+        <button class="ev-del" onclick="event.stopPropagation();delDiary(${d.id})" title="删除">×</button>
         ${d.image?`<img class="pr-diary-img" src="${d.image}">`:''}
         <div class="ev-text">${escapeHtml(d.text||'')}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 手帐日记</div>
