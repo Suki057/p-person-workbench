@@ -111,7 +111,16 @@
   /* ---------- 周打卡 tab ---------- */
   .week-head{display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;margin-bottom:10px;}
   .week-head div{text-align:center;font-size:12px;color:var(--done);}
-  .habit-row{display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:12px;}
+  .habit-row{position:relative;display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:12px;}
+  .habit-del{
+    position:absolute;right:-4px;top:50%;transform:translateY(-50%);
+    border:none;background:rgba(255,255,255,0.8);color:#a23b46;border-radius:50%;
+    width:22px;height:22px;font-size:14px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;z-index:3;
+    box-shadow:0 2px 6px rgba(150,90,100,.2);transition:background .2s,transform .15s,opacity .2s;opacity:0;
+  }
+  .habit-row:hover .habit-del,.habit-row:active .habit-del{opacity:1;}
+  .habit-del:active{background:var(--pink-mid);color:#fff;transform:translateY(-50%) scale(.9);}
   .habit-name{font-size:13px;display:flex;flex-direction:column;gap:2px;}
   .habit-name .nm{font-weight:600;color:#5a4a4a;}
   .habit-name .streak{font-size:10px;color:var(--done);}
@@ -200,9 +209,26 @@
   .diary-nav button{border:none;background:var(--pink);color:#a23b46;border-radius:12px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--cartoon);box-shadow:0 4px 12px rgba(242,103,116,.25);transition:opacity .2s,transform .15s;}
   .diary-nav button:active{opacity:.7;transform:scale(.96);}
   .diary-nav button:disabled{opacity:.4;box-shadow:none;}
-  .diary-add textarea{width:100%;min-height:64px;resize:vertical;margin-bottom:8px;}
-  .diary-add .row{display:flex;gap:8px;align-items:center;}
-  .diary-add input[type=file]{font-size:12px;flex:1;}
+  /* 保存日记：横向布局（文字 + 选取图片 + 保存 并排） */
+  .diary-add{padding:14px;}
+  .da-row{display:flex;gap:8px;align-items:center;}
+  .da-text{flex:1;min-width:0;border:1.5px solid rgba(255,255,255,.9);border-radius:12px;padding:9px 12px;font-size:14px;font-family:var(--cartoon);background:var(--glass-strong);color:#5a4a4a;}
+  .da-text::placeholder{color:var(--done);}
+  .da-file-btn{
+    flex:0 0 auto;border:1.5px dashed var(--pink-mid);border-radius:12px;padding:9px 12px;
+    font-size:13px;color:#a23b46;background:rgba(255,217,222,.35);cursor:pointer;
+    display:flex;align-items:center;gap:4px;font-family:var(--cartoon);white-space:nowrap;transition:background .2s,transform .15s;
+  }
+  .da-file-btn:active{transform:scale(.96);background:rgba(255,217,222,.6);}
+  .diary-add .btn{margin:0;flex:0 0 auto;}
+  .da-file-chip{
+    display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;
+    background:rgba(255,217,222,.3);border:1px solid rgba(242,103,116,.25);border-radius:12px;
+    font-size:12px;color:#a23b46;
+  }
+  .da-file-chip .fn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .da-file-x{border:none;background:var(--pink-mid);color:#fff;border-radius:50%;width:20px;height:20px;font-size:13px;line-height:1;cursor:pointer;flex:0 0 auto;transition:transform .15s;}
+  .da-file-x:active{transform:scale(.85);}
 
   /* 手帐事件删除按钮 */
   .ev-del{
@@ -321,10 +347,16 @@
         <button id="diaryNext" onclick="diaryNext()" data-page-node-id="RKUMXGHbWyCgKAMcElmMI9">下一天 ›</button>
       </div>
       <div class="card diary-add" data-page-node-id="w0jyYXfZv5DBuxDbrAFJ7a">
-        <textarea id="diaryText" placeholder="记录今天的一点小事…"></textarea>
-        <div class="row" data-page-node-id="fjQqSrtZNnBn9PiBGMzdPg">
-          <input type="file" id="diaryImg" accept="image/*" data-page-node-id="rRFQHW7HrE7fP9NM6Ci0MU">
-          <button class="btn" onclick="addDiary()" data-page-node-id="eXB9M8IsB6GbcjKZoGql21">保存日记</button>
+        <div class="da-row">
+          <input type="text" id="diaryText" class="da-text" placeholder="记录今天的一点小事…" data-page-node-id="drW9K8ZkPvXL1qy0LbA0nC">
+          <label class="da-file-btn" data-page-node-id="rRFQHW7HrE7fP9NM6Ci0MU">📎 图片
+            <input type="file" id="diaryImg" accept="image/*" hidden>
+          </label>
+          <button class="btn" onclick="addDiary()" data-page-node-id="eXB9M8IsB6GbcjKZoGql21">保存</button>
+        </div>
+        <div class="da-file-chip" id="diaryFileChip" hidden data-page-node-id="F1cVy2pWq2Xn4mR8sT0aBc">
+          <span class="fn" id="diaryFileName" data-page-node-id="gH3kL9mN2pQ4rS6tU8vWxY"></span>
+          <button type="button" class="da-file-x" onclick="clearDiaryFile()" data-page-node-id="xY7zA1bC3dE5fG7hI9jK">×</button>
         </div>
       </div>
     </section>
@@ -420,6 +452,10 @@ function renderHabits(){
       dot.onclick=()=>{h.days[i]=!h.days[i];save();renderHabits();updateStats();};
       row.appendChild(dot);
     });
+    const del=document.createElement('button');del.className='habit-del';del.textContent='×';
+    del.title='删除该习惯（可到回收站恢复）';
+    del.onclick=()=>delHabit(h.id);
+    row.appendChild(del);
     wrap.appendChild(row);
   });
 }
@@ -429,6 +465,7 @@ function addHabit(){
   state.habits.push({id:Date.now(),name:v,color:state.habits.length%3,days:Array(DAYS).fill(false)});
   inp.value='';save();renderHabits();updateStats();
 }
+function delHabit(id){const h=state.habits.find(x=>x.id===id);if(h)moveToTrash('habit',h);}
 
 /* ---------- 任务清单 ---------- */
 function renderTasks(){
@@ -469,6 +506,8 @@ function moveToTrash(type, item){
     state.diaries=state.diaries.filter(d=>d.id!==item.id);
   }else if(type==='task'){
     state.tasks=state.tasks.filter(t=>t.id!==item.id);
+  }else if(type==='habit'){
+    state.habits=state.habits.filter(h=>h.id!==item.id);
   }
   state.trash.unshift({
     trashId:Date.now()+'_'+Math.random().toString(36).slice(2,7),
@@ -476,7 +515,7 @@ function moveToTrash(type, item){
     deletedAt:new Date().toLocaleString('zh-CN',{hour12:false})
   });
   save();
-  renderPlanner();renderTasks();updateStats();
+  renderPlanner();renderTasks();renderHabits();updateStats();
   if(document.getElementById('page-trash').classList.contains('active'))renderTrash();
 }
 function delDiary(id){const d=state.diaries.find(x=>x.id===id);if(d)moveToTrash('diary',d);}
@@ -491,9 +530,11 @@ function renderTrash(){
   }
   wrap.innerHTML=state.trash.map(e=>{
     const isDiary=e.type==='diary';
-    const label=isDiary?'📖 手帐日记':'📝 任务';
-    const text=isDiary?(e.item.text||'(无文字)'):e.item.text;
-    const date=e.item.date||'';
+    const isHabit=e.type==='habit';
+    let label, text, date;
+    if(isDiary){label='📖 手帐日记';text=e.item.text||'(无文字)';date=e.item.date||'';}
+    else if(isHabit){label='✅ 周打卡习惯';text=e.item.name;date='连续'+maxStreak(e.item.days)+'天';}
+    else {label='📝 任务';text=e.item.text;date=e.item.date||'';}
     return `<div class="trash-item">
       <div class="trash-info">
         <div class="trash-type">${label} · ${date}</div>
@@ -512,9 +553,10 @@ function restoreFromTrash(trashId){
   if(idx<0)return;
   const e=state.trash[idx];
   if(e.type==='diary')state.diaries.push(e.item);
+  else if(e.type==='habit')state.habits.push(e.item);
   else state.tasks.push(e.item);
   state.trash.splice(idx,1);
-  save();renderTrash();renderPlanner();renderTasks();updateStats();
+  save();renderTrash();renderPlanner();renderTasks();renderHabits();updateStats();
 }
 function purgeTrash(trashId){
   state.trash=state.trash.filter(e=>e.trashId!==trashId);
@@ -642,7 +684,7 @@ function addDiary(){
   if(!text&&!file.files.length){return;}
   const entry={id:Date.now(),date:selectedDate,text};
   const done=()=>{
-    state.diaries.push(entry);save();tx.value='';file.value='';
+    state.diaries.push(entry);save();tx.value='';file.value='';hideDiaryFileChip();
     renderPlanner();renderTasks();updateStats();
   };
   if(file.files.length){
@@ -651,6 +693,23 @@ function addDiary(){
     reader.readAsDataURL(file.files[0]);
   }else done();
 }
+// 选取图片后显示可删除的 chip
+function showDiaryFileChip(){
+  const file=document.getElementById('diaryImg');
+  const chip=document.getElementById('diaryFileChip');
+  const fn=document.getElementById('diaryFileName');
+  if(file.files.length){fn.textContent=file.files[0].name;chip.hidden=false;}
+  else hideDiaryFileChip();
+}
+function hideDiaryFileChip(){
+  const chip=document.getElementById('diaryFileChip');
+  const file=document.getElementById('diaryImg');
+  if(chip)chip.hidden=true;
+  if(file)file.value='';
+}
+function clearDiaryFile(){hideDiaryFileChip();}
+// 绑定文件选择事件
+document.getElementById('diaryImg').addEventListener('change',showDiaryFileChip);
 // 触摸滑动翻页
 (function(){
   const stage=document.getElementById('diaryPaper');
