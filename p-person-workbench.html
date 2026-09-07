@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="fNeVUZyg6L80A1Z8CHjLYX">
-<head data-page-node-id="ob70oRAXIowFvACqBwAupz">
-<meta charset="UTF-8" data-page-node-id="xUrc9vl924408JvlCjRIVH">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="YkVHUvhAO03RxGZ66WBECv">
-<title>P人爆改J人 · 自律打卡工作台</title>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>P人爆改J人 · 自律打卡</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
 <meta name="mobile-web-app-capable" content="yes">
@@ -32,66 +32,65 @@
     color:var(--text);
     font-size:14px;
     line-height:1.5;
-    padding:16px;
-    min-height:100vh;
   }
-  .app{max-width:1280px;margin:0 auto;}
-  h1.title{font-size:16px;font-weight:600;margin-bottom:4px;}
-  .subtitle{font-size:13px;color:var(--done);margin-bottom:16px;}
+  .app{max-width:540px;margin:0 auto;min-height:100vh;padding:14px 14px 88px;display:flex;flex-direction:column;}
 
-  /* 顶部统计 */
-  .stats{
-    display:flex;gap:16px;flex-wrap:wrap;align-items:center;
-    background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
-    padding:16px 20px;margin-bottom:16px;
+  /* 顶部标题 */
+  .topbar{text-align:center;padding:4px 0 14px;}
+  .topbar h1{font-size:18px;font-weight:700;color:#5a5347;}
+  .topbar .sub{font-size:12px;color:var(--done);margin-top:2px;}
+
+  /* 页面容器 */
+  .pages{flex:1;}
+  .page{display:none;animation:fade .25s ease;}
+  .page.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px;}
+  .card h2{font-size:16px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+  .card h2 .hint{font-size:12px;color:var(--done);font-weight:400;}
+
+  /* 通用按钮 / 输入 */
+  .btn{border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;background:var(--pink);color:#7a5a63;transition:opacity .2s;}
+  .btn:active{opacity:.7;}
+  .btn.green{background:var(--green);color:#4f6f5a;}
+  input[type=text],input:not([type]),textarea{
+    border:1px solid #e3e0dc;border-radius:6px;padding:8px 10px;font-size:14px;background:var(--bg);font-family:inherit;
   }
-  .ring-wrap{display:flex;align-items:center;gap:10px;}
-  .ring{position:relative;width:72px;height:72px;}
-  .ring svg{transform:rotate(-90deg);}
-  .ring-bg{fill:none;stroke:#eee;stroke-width:7;}
-  .ring-fg{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
-  .ring-pct{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:15px;font-weight:600;
-  }
-  .ring-label{font-size:13px;}
-  .ring-label b{display:block;font-size:15px;margin-top:2px;}
-  .stats-divider{width:1px;height:48px;background:#eee;}
 
-  /* 三栏布局 */
-  .columns{display:flex;gap:16px;align-items:flex-start;}
-  .col{flex:1;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;}
-  .col h2{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
-  .col h2 .hint{font-size:12px;color:var(--done);font-weight:400;}
+  /* ---------- 打卡进度 tab ---------- */
+  .progress-rings{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;}
+  .ring-lg{position:relative;width:108px;height:108px;}
+  .ring-lg svg{transform:rotate(-90deg);}
+  .ring-lg .ring-bg{fill:none;stroke:#eee;stroke-width:9;}
+  .ring-lg .ring-fg{fill:none;stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
+  .ring-lg .ring-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#5a5347;}
+  .ring-lg .ring-pct small{font-size:11px;font-weight:400;color:var(--done);margin-top:2px;}
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+  .sum-item{background:var(--bg);border-radius:var(--radius);padding:14px 8px;text-align:center;}
+  .sum-item .num{font-size:22px;font-weight:700;color:#5a5347;line-height:1.1;}
+  .sum-item .lbl{font-size:12px;color:var(--done);margin-top:4px;}
 
-  /* 周打卡 */
-  .week-head{display:grid;grid-template-columns:80px repeat(7,1fr);gap:6px;margin-bottom:8px;}
+  /* ---------- 周打卡 tab ---------- */
+  .week-head{display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;margin-bottom:8px;}
   .week-head div{text-align:center;font-size:12px;color:var(--done);}
-  .habit-row{display:grid;grid-template-columns:80px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:10px;}
-  .habit-name{font-size:14px;display:flex;align-items:center;gap:6px;}
-  .habit-name .streak{font-size:11px;color:var(--done);}
+  .habit-row{display:grid;grid-template-columns:64px repeat(7,1fr);gap:6px;align-items:center;margin-bottom:10px;}
+  .habit-name{font-size:13px;display:flex;flex-direction:column;gap:1px;}
+  .habit-name .nm{font-weight:500;}
+  .habit-name .streak{font-size:10px;color:var(--done);}
   .dot{
     width:30px;height:30px;border-radius:50%;margin:0 auto;cursor:pointer;
     background:#fff;border:1.5px solid #e3e0dc;display:flex;align-items:center;justify-content:center;
-    font-size:15px;color:#fff;transition:transform .15s, background .2s;
-    user-select:none;
+    font-size:15px;color:#fff;transition:transform .15s, background .2s;user-select:none;
   }
   .dot:active{transform:scale(.85);}
   .dot.done{background:var(--c);border-color:var(--c);}
   .dot.done::after{content:"✓";}
-  .add-habit{margin-top:8px;display:flex;gap:6px;}
-  .add-habit input{flex:1;border:1px solid #e3e0dc;border-radius:6px;padding:7px 9px;font-size:13px;background:var(--bg);}
-  .btn{
-    border:none;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;
-    background:var(--pink);color:#7a5a63;transition:opacity .2s;
-  }
-  .btn:active{opacity:.7;}
-  .btn.green{background:var(--green);color:#4f6f5a;}
-  .btn.ghost{background:transparent;color:var(--done);}
+  .add-habit{margin-top:10px;display:flex;gap:6px;}
+  .add-habit input{flex:1;}
 
-  /* 任务清单 */
+  /* ---------- 每周任务 tab ---------- */
   .task-add{display:flex;gap:6px;margin-bottom:14px;}
-  .task-add input{flex:1;border:1px solid #e3e0dc;border-radius:6px;padding:8px 10px;font-size:14px;background:var(--bg);}
+  .task-add input{flex:1;}
   .task-date-group{margin-bottom:14px;}
   .task-date{font-size:12px;color:var(--done);margin:8px 0 6px;border-left:3px solid var(--green-mid);padding-left:8px;}
   .task-item{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px dashed #f0ede9;}
@@ -107,88 +106,42 @@
   .task-del{border:none;background:transparent;color:#c9bdbd;font-size:16px;cursor:pointer;padding:2px 6px;}
   .task-del:active{color:#e08a8a;}
 
-  /* 周计划手帐 */
-  .planner{
-    position:relative;height:360px;perspective:1500px;
+  /* ---------- 周计划手帐 tab（上下布局） ---------- */
+  .week-strip{display:flex;gap:6px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 6px;margin-bottom:14px;}
+  .ws-day{flex:1;text-align:center;padding:7px 0;border-radius:8px;cursor:pointer;transition:background .2s;position:relative;}
+  .ws-day .d-num{font-size:16px;font-weight:700;color:#5a5347;line-height:1.1;}
+  .ws-day .d-week{font-size:10px;color:var(--done);margin-top:2px;}
+  .ws-day.today::after{content:"今";position:absolute;top:-3px;right:3px;font-size:9px;color:var(--green-mid);font-weight:700;}
+  .ws-day.active{background:var(--pink-mid);}
+  .ws-day.active .d-num,.ws-day.active .d-week{color:#fff;}
+  .ws-day.active.today::after{color:#fff;}
+
+  .diary-paper{
+    position:relative;min-height:300px;perspective:1500px;
     background:linear-gradient(135deg,#F3E9DC,#EDE1CF);
-    border-radius:var(--radius);margin-bottom:4px;
+    border-radius:var(--radius);margin-bottom:14px;
     box-shadow:inset 0 0 0 1px #e7dccb, var(--shadow);
-    display:flex;padding:8px 0;gap:0;
+    padding:10px;
   }
-  .planner-spine{
-    position:absolute;left:50%;top:8px;bottom:8px;width:18px;
-    transform:translateX(-50%);z-index:3;
+  .paper-spine{
+    position:absolute;left:10px;top:10px;bottom:10px;width:14px;z-index:3;
     background:linear-gradient(90deg,#d9c7b0,#efe3d2,#d9c7b0);
-    border-radius:3px;
-    box-shadow:0 0 8px rgba(0,0,0,0.1), inset 0 0 3px rgba(0,0,0,0.05);
+    border-radius:3px;box-shadow:0 0 6px rgba(0,0,0,0.08);
   }
-  .planner-spine::before{
-    content:"";position:absolute;left:50%;top:14px;bottom:14px;width:2px;
-    transform:translateX(-50%);
-    background:repeating-linear-gradient(#c9b69c 0 5px,transparent 5px 12px);
-  }
-  .planner-left,.planner-right{
-    flex:1;background:#FFFDF7;padding:14px 12px;
-    position:relative;overflow:hidden;
-  }
-  .planner-left{
-    border-radius:8px 0 0 8px;margin-left:8px;
-    transform:rotateY(2deg);transform-origin:right center;
+  .paper-inner{
+    position:relative;margin-left:18px;min-height:280px;
+    background:#FFFDF7;border-radius:0 8px 8px 0;
     box-shadow:inset -8px 0 18px rgba(0,0,0,0.04), 2px 0 6px rgba(0,0,0,0.04);
+    padding:16px;transform-origin:left center;transform:rotateY(0deg);
+    backface-visibility:hidden;overflow:hidden;
   }
-  .planner-right{
-    border-radius:0 8px 8px 0;margin-right:8px;
-    transform:rotateY(-2deg);transform-origin:left center;
-    backface-visibility:hidden;
-    box-shadow:inset 8px 0 18px rgba(0,0,0,0.04), -2px 0 6px rgba(0,0,0,0.04);
-  }
-
-  /* 左页：周概览 */
-  .pw-header{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-  .pw-header .week-no{font-size:11px;background:var(--pink);color:#7a5a63;padding:1px 7px;border-radius:8px;}
-  .pw-list{max-height:290px;overflow-y:auto;}
-  .pw-day{
-    display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;
-    padding:5px 4px;border-radius:6px;cursor:pointer;transition:background .2s;
-  }
-  .pw-day:hover{background:rgba(0,0,0,0.02);}
-  .pw-day.active{background:rgba(173,217,190,0.22);}
-  .pw-date{flex:0 0 42px;text-align:center;}
-  .pw-date .d-num{font-size:17px;font-weight:700;color:#5a5347;line-height:1;}
-  .pw-date .d-week{font-size:11px;color:var(--done);margin-top:2px;}
-  .pw-events{flex:1;min-width:0;}
-  .pw-event-mini{
-    font-size:11px;color:#4a4a4a;background:rgba(224,240,230,0.85);
-    padding:2px 8px;border-radius:6px;margin-bottom:2px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .pw-event-mini.done{text-decoration:line-through;color:var(--done);background:#f0f0f0;}
-  .pw-event-mini.diary{background:var(--pink);}
-  .pw-empty-mini{font-size:11px;color:#ddd;padding:2px 8px;}
-
-  /* 右页：日详情 */
-  .pr-header{
-    display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;
-  }
-  .pr-date{display:flex;align-items:baseline;gap:8px;}
-  .pr-date .d-num{font-size:28px;font-weight:700;color:#5a5347;line-height:1;}
-  .pr-date .d-week{font-size:13px;color:var(--done);}
-  .pr-avatar{
-    width:36px;height:36px;border-radius:50%;background:var(--yellow);
-    display:flex;align-items:center;justify-content:center;font-size:18px;
-    box-shadow:var(--shadow);position:relative;cursor:pointer;
-  }
-  .pr-add{
-    position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;
-    background:#ff6b6b;color:#fff;display:flex;align-items:center;justify-content:center;
-    font-size:14px;line-height:1;box-shadow:0 2px 4px rgba(0,0,0,0.15);
-  }
-  .pr-events{max-height:250px;overflow-y:auto;}
+  .paper-date{font-size:13px;color:#8a7a5a;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .paper-date .week-no{font-size:11px;background:var(--pink);color:#7a5a63;padding:1px 7px;border-radius:8px;}
+  .paper-events{max-height:190px;overflow-y:auto;}
   .pr-event{
     background:var(--green-mid);color:#fff;border-radius:10px;
     padding:10px 12px;margin-bottom:8px;position:relative;
-    box-shadow:0 2px 6px rgba(0,0,0,0.08);cursor:pointer;
-    transition:opacity .2s,transform .15s;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);cursor:pointer;transition:opacity .2s,transform .15s;
   }
   .pr-event:active{transform:scale(.98);}
   .pr-event.done{opacity:.55;background:#b8c9bf;}
@@ -196,113 +149,122 @@
   .pr-event .ev-text.done{text-decoration:line-through;}
   .pr-event .ev-tag{font-size:10px;opacity:.92;margin-top:5px;}
   .pr-event.diary{background:var(--pink-mid);}
-  .pr-diary-img{width:100%;height:86px;object-fit:cover;border-radius:8px;margin-bottom:8px;}
-  .pr-empty{color:var(--done);font-size:13px;text-align:center;padding:50px 0;}
+  .pr-diary-img{width:100%;height:96px;object-fit:cover;border-radius:8px;margin-bottom:8px;}
+  .pr-empty{color:var(--done);font-size:13px;text-align:center;padding:48px 0;}
 
-  .diary-nav{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+  .diary-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
   .diary-nav .month{font-size:13px;color:var(--done);}
-  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;transition:opacity .2s;}
+  .diary-nav button{border:none;background:var(--pink);color:#7a5a63;border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;transition:opacity .2s;}
   .diary-nav button:active{opacity:.6;}
   .diary-nav button:disabled{opacity:.4;}
-  .diary-add{margin-top:12px;}
-  .diary-add textarea{
-    width:100%;border:1px solid #e3e0dc;border-radius:6px;padding:8px;font-size:13px;resize:vertical;
-    min-height:54px;background:var(--bg);font-family:inherit;margin-bottom:6px;
-  }
-  .diary-add .row{display:flex;gap:6px;align-items:center;}
+  .diary-add textarea{width:100%;min-height:64px;resize:vertical;margin-bottom:8px;}
+  .diary-add .row{display:flex;gap:8px;align-items:center;}
   .diary-add input[type=file]{font-size:12px;flex:1;}
-  .diary-add .btn{background:var(--green);color:#4f6f5a;}
 
-  @media (max-width:900px){
-    .columns{flex-direction:column;}
-    .col{width:100%;}
-    body{padding:10px;}
-    .planner{height:380px;}
-    .planner-left{padding:12px 8px;}
-    .planner-right{padding:12px 8px;}
-    .pw-date{flex:0 0 38px;}
-    .pw-date .d-num{font-size:15px;}
-    .pr-date .d-num{font-size:22px;}
+  /* ---------- 底部 tab bar ---------- */
+  .tabbar{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:540px;display:flex;background:#fff;
+    box-shadow:0 -2px 12px rgba(0,0,0,0.07);
+    padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:50;
+  }
+  .tab{
+    flex:1;border:none;background:transparent;cursor:pointer;
+    padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;
+    color:var(--done);font-size:11px;transition:color .2s;
+  }
+  .tab .ico{font-size:20px;line-height:1;}
+  .tab.active{color:var(--pink-mid);}
+  .tab:active{opacity:.7;}
+
+  @media (max-width:560px){
+    .app{padding:12px 12px 84px;}
   }
 </style>
 </head>
-<body data-page-node-id="rfz7qtJM0zmHaz3jVoKH7A">
-<div class="app" data-page-node-id="7jokPQICApHd2uJDB8vQnw">
-  <h1 class="title" data-page-node-id="aTM4DTpmgofSaSBmdsaNt2">P人爆改J人 · 自律打卡工作台</h1>
-  <div class="subtitle" data-page-node-id="CoUwIIYqQSTXXqrxj4CH1w">周打卡 · 任务清单 · 月度日记 · 一眼看清完成进度</div>
+<body>
+<div class="app">
+  <header class="topbar">
+    <h1>P人爆改J人 · 自律打卡</h1>
+    <div class="sub">用一点秩序，爆改散漫的自己 🌿</div>
+  </header>
 
-  <!-- 顶部数据统计 -->
-  <div class="stats" data-page-node-id="h9LpFJoojvE3itLofs1Gxl">
-    <div class="ring-wrap" data-page-node-id="ClnJ4sV0zhHHDMrl06kSRX">
-      <div class="ring" data-page-node-id="8sBNN3KurCcuycDeCISgFS">
-        <svg width="72" height="72" data-page-node-id="cnBWhGDoG6HRCXyVOoy59U">
-          <circle class="ring-bg" cx="36" cy="36" r="30" data-page-node-id="EKADhcCUEM2aQViXZQ4qtJ"></circle>
-          <circle class="ring-fg" id="ringWeekFg" cx="36" cy="36" r="30" stroke="#E6B8C4" data-page-node-id="YwzObfOv4MJ3UV2t1JBcxf"></circle>
-        </svg>
-        <div class="ring-pct" id="ringWeekPct" data-page-node-id="2sdZ473LCSPhVSRht75doY">0%</div>
+  <main class="pages">
+    <!-- 打卡进度 -->
+    <section class="page active" id="page-progress">
+      <div class="card">
+        <div class="progress-rings">
+          <div class="ring-lg">
+            <svg width="108" height="108"><circle class="ring-bg" cx="54" cy="54" r="46"/><circle class="ring-fg" id="ringWeekFg" cx="54" cy="54" r="46" stroke="#E6B8C4"/></svg>
+            <div class="ring-pct"><span id="ringWeekPct">0%</span><small>本周打卡</small></div>
+          </div>
+          <div class="ring-lg">
+            <svg width="108" height="108"><circle class="ring-bg" cx="54" cy="54" r="46"/><circle class="ring-fg" id="ringMonthFg" cx="54" cy="54" r="46" stroke="#ADD9BE"/></svg>
+            <div class="ring-pct"><span id="ringMonthPct">0%</span><small>本月任务</small></div>
+          </div>
+        </div>
+        <div class="summary">
+          <div class="sum-item"><div class="num" id="sumStreak">0</div><div class="lbl">最长连续打卡(天)</div></div>
+          <div class="sum-item"><div class="num" id="sumHabits">0</div><div class="lbl">习惯数量</div></div>
+          <div class="sum-item"><div class="num" id="sumTasks">0/0</div><div class="lbl">本月任务完成</div></div>
+          <div class="sum-item"><div class="num" id="sumDiary">0</div><div class="lbl">本月日记(篇)</div></div>
+        </div>
       </div>
-      <div class="ring-label" data-page-node-id="32cj5c1hFZY6bTAK1dEVRG">本周打卡完成率<b id="ringWeekSub" data-page-node-id="MX5d9sHbHMsz0cIBxUDHyH">0/0</b></div>
-    </div>
-    <div class="stats-divider" data-page-node-id="Gyuje1Zu2tkpdXfjD9pFmw"></div>
-    <div class="ring-wrap" data-page-node-id="eqLNlpWunbAH9NS4Dn1cGy">
-      <div class="ring" data-page-node-id="qLEFoYMq3DXpJQSQiq7rz3">
-        <svg width="72" height="72" data-page-node-id="mgrnXuN9h6zCKng7YyXaZN">
-          <circle class="ring-bg" cx="36" cy="36" r="30" data-page-node-id="OmnYMAlPLV1yGVFNqziBGI"></circle>
-          <circle class="ring-fg" id="ringMonthFg" cx="36" cy="36" r="30" stroke="#ADD9BE" data-page-node-id="yQqX1p6mWdRe6o2XA4zIye"></circle>
-        </svg>
-        <div class="ring-pct" id="ringMonthPct" data-page-node-id="rKkuzWnS2BM2NOqTfGPc7B">0%</div>
-      </div>
-      <div class="ring-label" data-page-node-id="nAmzKSkaISOOGzyd4NWMfY">本月任务完成率<b id="ringMonthSub" data-page-node-id="2tAqUAoCtU1Wgv91nmElgW">0/0</b></div>
-    </div>
-  </div>
+    </section>
 
-  <div class="columns" data-page-node-id="oeZw3DskdSHm5cK85KFkDO">
-    <!-- 左：周打卡 -->
-    <div class="col" data-page-node-id="q081Xcch4tIK5uErCGrTGX">
-      <h2 data-page-node-id="s2GNtduMBKjk1HjLLZJek3">周打卡 <span class="hint" data-page-node-id="w2VkV5mAiD3YF5LiP5optI">点击圆点打卡</span></h2>
-      <div class="week-head" data-page-node-id="F81hgdRgIQe56X6xqPLjI9">
-        <div data-page-node-id="BEFkoWCEhCdCLVYJ7Fu4cy"></div>
-        <div data-page-node-id="X7XyuaKvAjCmBoD5o2i5Qt">一</div><div data-page-node-id="L9OjD53tUL3GqMwtogw9eK">二</div><div data-page-node-id="HOMYQBHBbH2zj65evGJfQz">三</div><div data-page-node-id="Dxy23VtJLnWen4s2vTYlqw">四</div><div data-page-node-id="Ul6iqbZI6gX9KodUczBPjT">五</div><div data-page-node-id="ZZx6lK1KC0WKYrSLVT75zC">六</div><div data-page-node-id="N31JlYMYdOuv4UCfSlHUkS">日</div>
+    <!-- 周打卡 -->
+    <section class="page" id="page-weekcheck">
+      <div class="card">
+        <h2>周打卡 <span class="hint">点击圆点打卡</span></h2>
+        <div class="week-head"><div></div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>
+        <div id="habitList"></div>
+        <div class="add-habit">
+          <input id="habitInput" placeholder="新增习惯，如：喝水">
+          <button class="btn" onclick="addHabit()">添加</button>
+        </div>
       </div>
-      <div id="habitList" data-page-node-id="J9KyQ83YJgPpG0xOLlkjCj"></div>
-      <div class="add-habit" data-page-node-id="Cd17QAEc9oD5R1XEzID61K">
-        <input id="habitInput" placeholder="新增习惯，如：喝水" data-page-node-id="9luJGA08BL8OJUVi3eNqd7">
-        <button class="btn" onclick="addHabit()" data-page-node-id="LdGW5TRPHCJ7PPry11C0q2">添加</button>
-      </div>
-    </div>
+    </section>
 
-    <!-- 中：任务清单 -->
-    <div class="col" data-page-node-id="qL7sDy4oE9WuoZlTO1aQ5K">
-      <h2 data-page-node-id="NRr9F2LLSrAMbfEl0bTIHY">日/周任务 <span class="hint" data-page-node-id="4G74Uz7JUrLJJDFtbeHiE6">勾选即完成</span></h2>
-      <div class="task-add" data-page-node-id="nB5e7oRtEoGX1EP2NOon5Q">
-        <input id="taskInput" placeholder="输入新任务，回车添加" data-page-node-id="sezV8ZbRBAMN5sEk6RyofB">
-        <button class="btn green" onclick="addTask()" data-page-node-id="uFLsvUKlcPXXyC7lc1jn0E">添加</button>
+    <!-- 每周任务 -->
+    <section class="page" id="page-tasks">
+      <div class="card">
+        <h2>每周任务 <span class="hint">勾选即完成</span></h2>
+        <div class="task-add">
+          <input id="taskInput" placeholder="输入新任务，回车添加">
+          <button class="btn green" onclick="addTask()">添加</button>
+        </div>
+        <div id="taskList"></div>
       </div>
-      <div id="taskList" data-page-node-id="JEvu8T3o23AqtJrlBzhMdX"></div>
-    </div>
+    </section>
 
-    <!-- 右：周计划手帐 -->
-    <div class="col col-diary">
-      <h2>周计划手帐 <span class="hint">左页选日期 · 右页看详情</span></h2>
-      <div class="planner" id="planner">
-        <div class="planner-spine"></div>
-        <div class="planner-left" id="plannerLeft"></div>
-        <div class="planner-right" id="plannerRight"></div>
+    <!-- 周计划手帐 -->
+    <section class="page" id="page-planner">
+      <div class="week-strip" id="weekStrip"></div>
+      <div class="diary-paper">
+        <div class="paper-spine"></div>
+        <div class="paper-inner" id="diaryPaper"></div>
       </div>
       <div class="diary-nav">
         <button id="diaryPrev" onclick="diaryPrev()">‹ 上一天</button>
         <span class="month" id="diaryMonth"></span>
         <button id="diaryNext" onclick="diaryNext()">下一天 ›</button>
       </div>
-      <div class="diary-add">
+      <div class="card diary-add">
         <textarea id="diaryText" placeholder="记录今天的一点小事…"></textarea>
         <div class="row">
           <input type="file" id="diaryImg" accept="image/*">
           <button class="btn" onclick="addDiary()">保存日记</button>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-tab="progress" onclick="switchTab('progress')"><span class="ico">📊</span>打卡进度</button>
+    <button class="tab" data-tab="weekcheck" onclick="switchTab('weekcheck')"><span class="ico">✅</span>周打卡</button>
+    <button class="tab" data-tab="tasks" onclick="switchTab('tasks')"><span class="ico">📝</span>每周任务</button>
+    <button class="tab" data-tab="planner" onclick="switchTab('planner')"><span class="ico">📖</span>周计划手帐</button>
+  </nav>
 </div>
 
 <script>
@@ -339,6 +301,15 @@ function loadState(){
 }
 function save(){localStorage.setItem(STORE_KEY,JSON.stringify(state));}
 
+/* ---------- 底部 tab 切换 ---------- */
+function switchTab(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('page-'+name);
+  if(page)page.classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  if(name==='planner')renderPlanner();
+}
+
 /* ---------- 周打卡 ---------- */
 function maxStreak(days){
   let best=0,cur=0;
@@ -351,7 +322,7 @@ function renderHabits(){
     const p=PALETTE[h.color%3];
     const row=document.createElement('div');row.className='habit-row';
     const name=document.createElement('div');name.className='habit-name';
-    name.innerHTML=`<span>${h.name}</span><span class="streak">连续${maxStreak(h.days)}天</span>`;
+    name.innerHTML=`<span class="nm">${h.name}</span><span class="streak">连续${maxStreak(h.days)}天</span>`;
     row.appendChild(name);
     h.days.forEach((done,i)=>{
       const dot=document.createElement('div');
@@ -367,7 +338,7 @@ function addHabit(){
   const inp=document.getElementById('habitInput');
   const v=inp.value.trim();if(!v)return;
   state.habits.push({id:Date.now(),name:v,color:state.habits.length%3,days:Array(DAYS).fill(false)});
-  inp.value='';save();renderHabits();
+  inp.value='';save();renderHabits();updateStats();
 }
 
 /* ---------- 任务清单 ---------- */
@@ -376,7 +347,7 @@ function renderTasks(){
   const groups={};
   state.tasks.forEach(t=>{(groups[t.date]=groups[t.date]||[]).push(t);});
   const dates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
-  if(dates.length===0){wrap.innerHTML='<div class="diary-empty">还没有任务，添加一条开始吧～</div>';return;}
+  if(dates.length===0){wrap.innerHTML='<div class="pr-empty">还没有任务，添加一条开始吧～</div>';return;}
   dates.forEach(date=>{
     const g=document.createElement('div');g.className='task-date-group';
     const head=document.createElement('div');head.className='task-date';
@@ -403,7 +374,7 @@ function addTask(){
 }
 document.getElementById('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
 
-/* ---------- 周计划手帐 ---------- */
+/* ---------- 周计划手帐（日期在上 + 日记在下） ---------- */
 let selectedDate=todayStr();
 const DAY_NAMES=['周日','周一','周二','周三','周四','周五','周六'];
 function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -428,76 +399,62 @@ function getDayEvents(dateStr){
     diaries:state.diaries.filter(d=>d.date===dateStr).sort((a,b)=>b.id-a.id)
   };
 }
-function renderPlanner(){
+// 顶部周历条
+function renderWeekStrip(){
+  const strip=document.getElementById('weekStrip');if(!strip)return;
   const week=getWeekDates(selectedDate);
-  const left=document.getElementById('plannerLeft');
-  const right=document.getElementById('plannerRight');
-  const monthLabel=document.getElementById('diaryMonth');
-
-  // 左页：周概览
-  let leftHTML=`<div class="pw-header">${Number(selectedDate.slice(5,7))}月 <span class="week-no">第${weekNumber(week[0])}周</span></div><div class="pw-list">`;
-  week.forEach(date=>{
-    const {tasks,diaries}=getDayEvents(date);
-    const isActive=date===selectedDate;
-    const isToday=date===todayStr();
-    leftHTML+=`<div class="pw-day ${isActive?'active':''}" onclick="selectDate('${date}')">
-      <div class="pw-date">
-        <div class="d-num">${Number(date.slice(8))}</div>
-        <div class="d-week">${dayName(date)}${isToday?' · 今':''}</div>
-      </div>
-      <div class="pw-events">
-        ${tasks.map(t=>`<div class="pw-event-mini ${t.done?'done':''}">${escapeHtml(t.text)}</div>`).join('')}
-        ${diaries.map(d=>`<div class="pw-event-mini diary">📝 日记</div>`).join('')}
-        ${!tasks.length&&!diaries.length?'<div class="pw-empty-mini">—</div>':''}
-      </div>
+  strip.innerHTML=week.map(date=>{
+    const isActive=date===selectedDate, isToday=date===todayStr();
+    return `<div class="ws-day ${isActive?'active':''} ${isToday?'today':''}" onclick="selectDate('${date}')">
+      <div class="d-num">${Number(date.slice(8))}</div>
+      <div class="d-week">${dayName(date).replace('周','')}</div>
     </div>`;
-  });
-  leftHTML+='</div>';
-  left.innerHTML=leftHTML;
-
-  // 右页：日详情
+  }).join('');
+}
+// 中间日记纸（单页，可 3D 翻页）
+function renderDiaryPaper(){
+  const paper=document.getElementById('diaryPaper');if(!paper)return;
   const {tasks,diaries}=getDayEvents(selectedDate);
-  let rightHTML=`<div class="pr-header">
-    <div class="pr-date"><div class="d-num">${Number(selectedDate.slice(8))}</div><div class="d-week">${dayName(selectedDate)}</div></div>
-    <div class="pr-avatar" onclick="focusDiary()">🌿<div class="pr-add">+</div></div>
-  </div><div class="pr-events">`;
+  let html=`<div class="paper-date">${Number(selectedDate.slice(5,7))}月${Number(selectedDate.slice(8))}日 ${dayName(selectedDate)} <span class="week-no">第${weekNumber(selectedDate)}周</span></div><div class="paper-events">`;
   if(!tasks.length&&!diaries.length){
-    rightHTML+=`<div class="pr-empty">这一天还没有记录<br>在下方写点什么吧 🌿</div>`;
+    html+=`<div class="pr-empty">这一天还没有记录<br>在下方写点什么吧 🌿</div>`;
   }else{
     tasks.forEach(t=>{
-      rightHTML+=`<div class="pr-event ${t.done?'done':''}" onclick="toggleTask(${t.id})">
+      html+=`<div class="pr-event ${t.done?'done':''}" onclick="toggleTask(${t.id})">
         <div class="ev-text ${t.done?'done':''}">${escapeHtml(t.text)}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 每天一件自律小事</div>
       </div>`;
     });
     diaries.forEach(d=>{
-      rightHTML+=`<div class="pr-event diary">
+      html+=`<div class="pr-event diary">
         ${d.image?`<img class="pr-diary-img" src="${d.image}">`:''}
         <div class="ev-text">${escapeHtml(d.text||'')}</div>
         <div class="ev-tag">#${selectedDate.slice(0,7)} | 手帐日记</div>
       </div>`;
     });
   }
-  rightHTML+='</div>';
-  right.innerHTML=rightHTML;
-
-  monthLabel.textContent=selectedDate.slice(0,7)+' · '+dayName(selectedDate);
+  html+='</div>';
+  paper.innerHTML=html;
+  const mon=document.getElementById('diaryMonth');
+  if(mon)mon.textContent=selectedDate.slice(0,7)+' · '+dayName(selectedDate);
   updateDiaryNav();
 }
+function renderPlanner(){renderWeekStrip();renderDiaryPaper();}
+
 let plannerFlipLock=false;
 function flipTo(date, dir){
   if(plannerFlipLock||date===selectedDate)return;
-  const right=document.getElementById('plannerRight');
+  const paper=document.getElementById('diaryPaper');
   plannerFlipLock=true;
-  right.style.transition='transform .32s ease-in';
-  right.style.transform='rotateY('+(dir>0?-150:150)+'deg)'; // 当前页绕书脊翻折离开
+  paper.style.transition='transform .32s ease-in';
+  paper.style.transform='rotateY('+(dir>0?-150:150)+'deg)'; // 当前页绕书脊翻折离开
   setTimeout(()=>{
     selectedDate=date;renderPlanner(); // 换内容
-    right.style.transition='none';
-    right.style.transform='rotateY('+(dir>0?150:-150)+'deg)'; // 从另一侧预备进入
+    paper.style.transition='none';
+    paper.style.transform='rotateY('+(dir>0?150:-150)+'deg)'; // 从另一侧预备进入
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      right.style.transition='transform .32s ease-out';
-      right.style.transform='rotateY(-2deg)'; // 转回微张原位
+      paper.style.transition='transform .32s ease-out';
+      paper.style.transform='rotateY(0deg)'; // 转回平整
     }));
     setTimeout(()=>{plannerFlipLock=false;},340);
   },320);
@@ -521,7 +478,7 @@ function diaryNext(){
 }
 function toggleTask(id){
   const t=state.tasks.find(x=>x.id===id);
-  if(t){t.done=!t.done;save();renderTasks();renderPlanner();updateStats();}
+  if(t){t.done=!t.done;save();renderPlanner();renderTasks();updateStats();}
 }
 function focusDiary(){document.getElementById('diaryText').focus();}
 function addDiary(){
@@ -540,9 +497,9 @@ function addDiary(){
     reader.readAsDataURL(file.files[0]);
   }else done();
 }
-// 触摸滑动切换日期
+// 触摸滑动翻页
 (function(){
-  const stage=document.getElementById('planner');
+  const stage=document.getElementById('diaryPaper');
   if(!stage)return;
   let sx=0,sy=0;
   stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
@@ -554,25 +511,34 @@ function addDiary(){
   },{passive:true});
 })();
 
-/* ---------- 顶部统计 ---------- */
-function setRing(fgId,pctId,subId,pct,sub){
-  const C=2*Math.PI*30;
-  document.getElementById(fgId).style.strokeDasharray=C;
-  document.getElementById(fgId).style.strokeDashoffset=C*(1-pct/100);
+/* ---------- 打卡进度统计 ---------- */
+function setRing(fgId,pctId,pct){
+  const C=2*Math.PI*46;
+  const fg=document.getElementById(fgId);
+  fg.style.strokeDasharray=C;
+  fg.style.strokeDashoffset=C*(1-pct/100);
   document.getElementById(pctId).textContent=Math.round(pct)+'%';
-  document.getElementById(subId).textContent=sub;
+}
+function inThisWeek(dateStr){
+  return getWeekDates(todayStr()).includes(dateStr);
 }
 function updateStats(){
   // 本周打卡完成率
   let total=0,done=0;
   state.habits.forEach(h=>h.days.forEach(d=>{total++;if(d)done++;}));
   const wp=total?done/total*100:0;
-  setRing('ringWeekFg','ringWeekPct','ringWeekSub',wp,`${done}/${total}`);
+  setRing('ringWeekFg','ringWeekPct',wp);
   // 本月任务完成率
   const mt=state.tasks.filter(t=>monthStr(t.date)===thisMonth());
   const mtDone=mt.filter(t=>t.done).length;
   const mp=mt.length?mtDone/mt.length*100:0;
-  setRing('ringMonthFg','ringMonthPct','ringMonthSub',mp,`${mtDone}/${mt.length}`);
+  setRing('ringMonthFg','ringMonthPct',mp);
+  // 汇总卡片
+  document.getElementById('sumStreak').textContent=state.habits.length?Math.max(...state.habits.map(h=>maxStreak(h.days))):0;
+  document.getElementById('sumHabits').textContent=state.habits.length;
+  const wt=state.tasks.filter(t=>inThisWeek(t.date));
+  document.getElementById('sumTasks').textContent=wt.filter(t=>t.done).length+'/'+wt.length;
+  document.getElementById('sumDiary').textContent=state.diaries.filter(d=>monthStr(d.date)===thisMonth()).length;
 }
 
 /* 初始化 */
