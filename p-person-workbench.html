@@ -166,6 +166,13 @@
   .ws-day.active{background:var(--pink-mid);box-shadow:0 4px 12px rgba(242,103,116,.35);}
   .ws-day.active .d-num,.ws-day.active .d-week{color:#fff;}
   .ws-day.active.today::after{color:#fff;}
+  /* 日期格子里显示「有内容」标记（恢复摊开式左页概览的能力） */
+  .ws-marks{display:flex;gap:3px;justify-content:center;margin-top:5px;min-height:9px;}
+  .ws-dot{width:8px;height:8px;border-radius:50%;font-size:8px;line-height:8px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--cartoon);}
+  .ws-dot.diary{background:var(--pink-mid);}
+  .ws-dot.task{background:var(--green-mid);}
+  .ws-day.active .ws-dot.diary{background:rgba(255,255,255,.95);color:var(--pink-mid);}
+  .ws-day.active .ws-dot.task{background:rgba(255,255,255,.95);color:var(--green-mid);}
 
   .diary-paper{
     position:relative;min-height:300px;perspective:1500px;
@@ -659,9 +666,19 @@ function renderWeekStrip(){
   const week=getWeekDates(selectedDate);
   strip.innerHTML=week.map(date=>{
     const isActive=date===selectedDate, isToday=date===todayStr();
+    const nD=state.diaries.filter(d=>d.date===date).length;
+    const nT=state.tasks.filter(t=>t.date===date).length;
+    let marks='';
+    if(nD>0||nT>0){
+      marks='<div class="ws-marks">';
+      if(nD>0)marks+=`<span class="ws-dot diary" title="${nD}篇日记">${nD>1?nD:''}</span>`;
+      if(nT>0)marks+=`<span class="ws-dot task" title="${nT}项任务">${nT>1?nT:''}</span>`;
+      marks+='</div>';
+    }
     return `<div class="ws-day ${isActive?'active':''} ${isToday?'today':''}" onclick="selectDate('${date}')">
       <div class="d-num">${Number(date.slice(8))}</div>
       <div class="d-week">${dayName(date).replace('周','')}</div>
+      ${marks}
     </div>`;
   }).join('');
 }
